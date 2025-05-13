@@ -87,6 +87,7 @@
             // 
             // doodleCanvas
             // 
+            doodleCanvas.BackgroundImage = Properties.Resources.Background;
             doodleCanvas.Dock = DockStyle.Fill;
             doodleCanvas.Location = new Point(0, 0);
             doodleCanvas.Name = "doodleCanvas";
