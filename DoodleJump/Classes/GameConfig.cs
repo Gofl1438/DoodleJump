@@ -13,8 +13,7 @@ namespace DoodleJump.Classes
 
         public static Size CanvasParameters { get; private set; }
         public static readonly int PaddingCanvas = 20;
-
-
+        public static readonly int DifficultyCoefficient = 500;
         public static void Initialize(Size canvasSize)
         {
             CanvasParameters = canvasSize;
@@ -102,14 +101,22 @@ namespace DoodleJump.Classes
         }
 
 
+        public static class Probabilities
+        {
+            public static float BlueStart = 0.1f;
+            public static float BrownStart = 0.3f;
+            public static float GreenStart = 0.6f;
+            public static float WhiteStart = 0f;
 
+            public static float BlueScoreFactor = 0.01f;
+            public static float BrownScoreFactor = -0.01f;
+            public static float GreenScoreFactor = -0.02f;
+            public static float WhiteScoreFactor = 0.02f;
 
-
-
-
-
-
-
-
+            public static float BlueMax = 0.3f;
+            public static float BrownMin = 0.2f;
+            public static float GreenMin = 0.2f;
+            public static float WhiteMax = 0.2f;
+        }
     }
 }
