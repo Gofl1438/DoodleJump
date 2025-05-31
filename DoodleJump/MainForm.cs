@@ -30,6 +30,7 @@ namespace DoodleJump
 
         private void OnKeyBoardUp(object sender, KeyEventArgs e)
         {
+            player.Physics.dx = 0;
             if (e.KeyCode == Keys.Up)
             {
                 player.Sprite = GameConfig.Player.Sprites.Right;
@@ -82,15 +83,21 @@ namespace DoodleJump
 
         private void Update(object sender, EventArgs e)
         {
+            GameManagerObjectCanvas.MaintainPlatformsCount();
+            this.Text = "Doodle Jump: Score - " + GameState.Score;
             GameManagerObjectCanvas.GenerateStartSequence();
+            GameManagerObjectCanvas.DeleteTouchObject();
+            GameManagerObjectCanvas.ClearObjectCanvas();
+            GameManagerObjectCanvas.ApplyPhysicsObject();
+            player.Physics.WrapHorizontalPosition(doodleCanvas);
             player.Physics.ApplyPhysics();
             doodleCanvas.Invalidate();
+            FollowPlayer();
         }
 
         private void OnRepaint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-            player.DrawSprite(g);
             if (GameManagerObjectCanvas.objectCanvas.Count > 0)
             {
                 for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
@@ -98,7 +105,30 @@ namespace DoodleJump
                     GameManagerObjectCanvas.objectCanvas[i].DrawSprite(g);
                 }
             }
+            player.DrawSprite(g);
             doodleCanvas.Invalidate();
+        }
+
+        private void FollowPlayer()
+        {
+            float playerY = player.Physics.transform.Position.Y;
+            float halfScreenHeight = GameConfig.CanvasParameters.Height / 2f;
+
+            if (playerY < halfScreenHeight)
+            {
+                float offset = halfScreenHeight - playerY;
+                MoveAllObjects(offset);
+                player.Physics.transform.Position.Y += offset;
+            }
+        }
+
+        private void MoveAllObjects(float offset)
+        {
+            for (int i = GameManagerObjectCanvas.objectCanvas.Count - 1; i >= 0; i--)
+            {
+                var obj = GameManagerObjectCanvas.objectCanvas[i];
+                obj.Transform.Position.Y += offset;
+            }
         }
     }
 }

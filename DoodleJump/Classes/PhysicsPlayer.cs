@@ -121,5 +121,21 @@ namespace DoodleJump.Classes
         {
             gravity = GameConfig.Player.DefaultGrafity;
         }
+
+        public void WrapHorizontalPosition(PictureBox doodleCanvas)
+        {
+            float halfWidth = transform.Size.Width * 0.5f;
+            float canvasWidth = doodleCanvas.Width;
+            float currentX = transform.Position.X;
+
+            if (currentX + halfWidth > canvasWidth)
+            {
+                transform.Position.X = -halfWidth;
+            }
+            else if (currentX < -halfWidth)
+            {
+                transform.Position.X = canvasWidth - halfWidth;
+            }
+        }
     }
 }
