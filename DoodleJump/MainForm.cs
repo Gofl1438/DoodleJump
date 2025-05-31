@@ -1,0 +1,96 @@
+using DoodleJump.Classes;
+using System.Timers;
+
+namespace DoodleJump
+{
+    public partial class MainForm : Form
+    {
+        Player player;
+        Rectangle workingArea;
+        System.Timers.Timer timer;
+        GameState gameState;
+        public MainForm()
+        {
+            InitializeComponent();
+            ÑalibrationSize();
+            InitializeGameState();
+            player = new Player();
+            timer = new System.Timers.Timer(15);
+            timer.AutoReset = true;
+            timer.SynchronizingObject = this;
+            timer.Elapsed += Timer_Elapsed;
+            timer.Start();
+            this.KeyDown += new KeyEventHandler(OnKeyBoardPressed);
+            this.KeyUp += new KeyEventHandler(OnKeyBoardUp);
+        }
+
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            Update(this, EventArgs.Empty);
+        }
+
+
+        private void OnKeyBoardUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up)
+            {
+                player.Sprite = GameConfig.Player.Sprites.Right;
+            }
+        }
+
+        private void OnKeyBoardPressed(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode.ToString())
+            {
+                case "Right":
+                case "D":
+                    player.Physics.dx = GameConfig.Player.MovingOx;
+                    if (player.Sprite != GameConfig.Player.Sprites.Right)
+                    {
+                        player.Sprite = GameConfig.Player.Sprites.Right;
+                    }
+                    break;
+                case "Left":
+                case "A":
+                    player.Physics.dx = -GameConfig.Player.MovingOx;
+                    if (player.Sprite != GameConfig.Player.Sprites.Left)
+                    {
+                        player.Sprite = GameConfig.Player.Sprites.Left;
+                    }
+                    break;
+                case "Up":
+                case "W":
+                    if (player.Sprite != GameConfig.Player.Sprites.Up)
+                    {
+                        player.Sprite = GameConfig.Player.Sprites.Up;
+                    }
+                    break;
+            }
+        }
+
+        private void ÑalibrationSize()
+        {
+            workingArea = Screen.FromControl(this).WorkingArea;
+            this.Height = workingArea.Height;
+            this.Width = workingArea.Width;
+            this.MinimumSize = new Size(workingArea.Width, workingArea.Height);
+            GameConfig.Initialize(new Size(doodleCanvas.Size.Width, doodleCanvas.Size.Height));
+        }
+
+        private void InitializeGameState()
+        {
+            gameState = new GameState();
+        }
+
+        private void Update(object sender, EventArgs e)
+        {
+        }
+
+        private void OnRepaint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            player.DrawSprite(g);
+            doodleCanvas.Invalidate();
+        }
+    }
+}

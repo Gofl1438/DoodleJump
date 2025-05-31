@@ -1,6 +1,6 @@
 ﻿namespace DoodleJump
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -94,8 +94,9 @@
             doodleCanvas.Size = new Size(600, 861);
             doodleCanvas.TabIndex = 0;
             doodleCanvas.TabStop = false;
+            doodleCanvas.Paint += OnRepaint;
             // 
-            // Form1
+            // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -103,9 +104,10 @@
             ClientSize = new Size(1020, 861);
             Controls.Add(tableLayoutPanel1);
             DoubleBuffered = true;
+            KeyPreview = true;
             MdiChildrenMinimizedAnchorBottom = false;
             MinimumSize = new Size(600, 861);
-            Name = "Form1";
+            Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Form1";
             WindowState = FormWindowState.Maximized;
