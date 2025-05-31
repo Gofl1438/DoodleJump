@@ -22,7 +22,32 @@ namespace DoodleJump.Classes
 
         public void CollideWithMonstrum()
         {
-            //дописать коллизию
+            float OxBall = transform.Position.X;
+            float OyBall = transform.Position.Y;
+            int WidthBall = transform.Size.Width;
+            int HeightBall = transform.Size.Height;
+            foreach (var obj in GameManagerObjectCanvas.objectCanvas)
+            {
+                if (obj is Monstrum monstrum)
+                {
+                    float OxMonstr = monstrum.Transform.Position.X;
+                    float OyMonstr = monstrum.Transform.Position.Y;
+                    int WidthMonstr = monstrum.Transform.Size.Width;
+                    int HeightMonstr = monstrum.Transform.Size.Height;
+                    if (OxBall <= OxMonstr + WidthMonstr && OxBall + WidthBall >= OxMonstr)
+                    {
+                        if (OyBall + HeightBall >= OyMonstr && OyBall + HeightBall <= OyMonstr + HeightMonstr)
+                        {
+                            IsWasHit = true;
+                            if (monstrum.HealthPoints == 0)
+                            {
+                                monstrum.IsTouchedByPlayer = true;
+                            }
+                            monstrum.HealthPoints--;
+                        }
+                    }
+                }
+            }
         }
     }
 }

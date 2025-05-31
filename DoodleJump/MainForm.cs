@@ -15,6 +15,7 @@ namespace DoodleJump
             ÑalibrationSize();
             InitializeGameState();
             player = new Player();
+            GameManagerObjectCanvas.GenerateStartSequence();
             timer = new System.Timers.Timer(15);
             timer.AutoReset = true;
             timer.SynchronizingObject = this;
@@ -63,6 +64,7 @@ namespace DoodleJump
                     {
                         player.Sprite = GameConfig.Player.Sprites.Up;
                     }
+                    AddBallList();
                     break;
             }
         }
@@ -83,12 +85,13 @@ namespace DoodleJump
 
         private void Update(object sender, EventArgs e)
         {
-            GameManagerObjectCanvas.MaintainPlatformsCount();
             this.Text = "Doodle Jump: Score - " + GameState.Score;
-            GameManagerObjectCanvas.GenerateStartSequence();
             GameManagerObjectCanvas.DeleteTouchObject();
             GameManagerObjectCanvas.ClearObjectCanvas();
             GameManagerObjectCanvas.ApplyPhysicsObject();
+            GameManagerObjectCanvas.MaintainPlatformsCount();
+            GameManagerObjectCanvas.ApplyPhysicsBall();
+            GameManagerObjectCanvas.ClearBall();
             player.Physics.WrapHorizontalPosition(doodleCanvas);
             player.Physics.ApplyPhysics();
             doodleCanvas.Invalidate();
@@ -105,8 +108,24 @@ namespace DoodleJump
                     GameManagerObjectCanvas.objectCanvas[i].DrawSprite(g);
                 }
             }
+            if (GameManagerObjectCanvas.ball.Count > 0)
+            {
+                for (int i = 0; i < GameManagerObjectCanvas.ball.Count; i++)
+                {
+                    GameManagerObjectCanvas.ball[i].DrawSprite(g);
+                }
+            }
             player.DrawSprite(g);
             doodleCanvas.Invalidate();
+        }
+
+
+        private void AddBallList()
+        {
+            int posY = (int)player.Physics.transform.Position.Y;
+            int posX = (int)player.Physics.transform.Position.X;
+            Ball ball = new Ball(posX, posY);
+            GameManagerObjectCanvas.ball.Add(ball);
         }
 
         private void FollowPlayer()

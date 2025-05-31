@@ -9,7 +9,7 @@ namespace DoodleJump.Classes
     public class Monstrum : ObjectObstacles
     {
         public GameConfig.MonstrumType Type { get; private set; }
-        public int HealthPoints { get; private set; }
+        public int HealthPoints { get; set; }
         public Monstrum(Point position, GameConfig.MonstrumType typeMonstrum, int healthPoints)
         {
             Type = typeMonstrum;
