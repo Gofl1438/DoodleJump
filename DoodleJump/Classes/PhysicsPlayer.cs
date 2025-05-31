@@ -44,6 +44,11 @@ namespace DoodleJump.Classes
         /// </summary>
         public void CollideWithObject()
         {
+            if (transform.Position.Y > GameConfig.CanvasParameters.Height)
+            {
+                GameState.IsFallDeath = true;
+                return;
+            }
             int LengthTrunk = GameConfig.Player.Dimensions.LengthTrunk;
             float OxPlayer = transform.Position.X;
             float OyPlayer = transform.Position.Y;
@@ -92,7 +97,7 @@ namespace DoodleJump.Classes
                                 }
                                 else if (OyPlayer + HeightPlayer < OyObj + HeightObj)
                                 {
-                                    //пока заглушка
+                                    GameState.IsMonsterDeath = true;
                                 }
                             }
                         }
@@ -100,7 +105,7 @@ namespace DoodleJump.Classes
                         {
                             if ((OyPlayer + LengthTrunk <= OyObj + HeightObj) && (OyPlayer + LengthTrunk >= OyObj))
                             {
-                                //пока заглушка
+                                GameState.IsMonsterDeath = true;
                             }
                         }
                         break;

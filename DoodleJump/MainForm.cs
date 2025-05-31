@@ -85,18 +85,105 @@ namespace DoodleJump
 
         private void Update(object sender, EventArgs e)
         {
-            this.Text = "Doodle Jump: Score - " + GameState.Score;
-            GameManagerObjectCanvas.DeleteTouchObject();
-            GameManagerObjectCanvas.ClearObjectCanvas();
-            GameManagerObjectCanvas.ApplyPhysicsObject();
-            GameManagerObjectCanvas.MaintainPlatformsCount();
-            GameManagerObjectCanvas.ApplyPhysicsBall();
+            if (GameState.IsMonsterDeath)
+            {
+                FollowMonsterDeath();
+                player.Physics.MoveOx();
+            }
+            else if (GameState.IsFallDeath)
+            {
+                FollowFallDeath();
+                player.Physics.MoveOx();
+            }
+            else
+            {
+                GameManagerObjectCanvas.MaintainPlatformsCount();
+                GameManagerObjectCanvas.DeleteTouchObject();
+                GameManagerObjectCanvas.ClearObjectCanvas();
+                player.Physics.ApplyPhysics();
+                FollowPlayer();
+            }
             GameManagerObjectCanvas.ClearBall();
+            GameManagerObjectCanvas.ApplyPhysicsObject();
+            GameManagerObjectCanvas.ApplyPhysicsBall();
             player.Physics.WrapHorizontalPosition(doodleCanvas);
-            player.Physics.ApplyPhysics();
             doodleCanvas.Invalidate();
-            FollowPlayer();
         }
+
+
+        /// <summary>
+        /// Перемещение камеры при столкновении с чудищем
+        /// </summary>
+        private void FollowMonsterDeath()
+        {
+            if (player.Physics.transform.Position.Y < GameConfig.CanvasParameters.Height)
+            {
+                int offset = GameConfig.CameraSpeeds.MonsterDeath;
+                for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
+                {
+                    var plaform = GameManagerObjectCanvas.objectCanvas[i];
+                    plaform.Transform.Position.Y -= (offset);
+                }
+                if (GameManagerObjectCanvas.objectCanvas[GameManagerObjectCanvas.objectCanvas.Count / 3].Transform.Position.Y < 0)
+                {
+                    player.Physics.transform.Position.Y += offset;
+                }
+            }
+            else
+            {
+                timer.Stop(); // появление окна рестарта с кнопками
+                GameState.IsSceneGameOver = true;
+            }
+        }
+
+        /// <summary>
+        /// Перемещении камеры при "глубоком падении"
+        /// </summary>
+        private void FollowFallDeath()
+        {
+            if (player.Physics.transform.Position.Y < GameConfig.CanvasParameters.Height / 2)
+            {
+                GameState.IsFallDeathSceneTwo = true;
+            }
+            if (GameConfig.CanvasParameters.Height / 2 < player.Physics.transform.Position.Y && !GameState.IsFallDeathSceneTwo)
+            {
+                int offset = GameConfig.CameraSpeeds.FallDeath;
+                player.Physics.transform.Position.Y -= offset;
+                for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
+                {
+                    var plaform = GameManagerObjectCanvas.objectCanvas[i];
+                    plaform.Transform.Position.Y -= (offset);
+                }
+            }
+            if (GameState.IsFallDeathSceneTwo)
+            {
+                FollowFallDeathSceneTwo();
+            }
+        }
+
+        /// <summary>
+        /// Вторая сцена проигрыша при "глубоком падении"
+        /// </summary>
+        private void FollowFallDeathSceneTwo()
+        {
+            if (player.Physics.transform.Position.Y < GameConfig.CanvasParameters.Height)
+            {
+                int offset = GameConfig.CameraSpeeds.FallDeathSceneTwo;
+                player.Physics.transform.Position.Y += offset;
+                for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
+                {
+                    var plaform = GameManagerObjectCanvas.objectCanvas[i];
+                    plaform.Transform.Position.Y -= (offset);
+                }
+            }
+            else
+            {
+                timer.Stop();
+                GameState.IsSceneGameOver = true;
+            }
+        }
+
+
 
         private void OnRepaint(object sender, PaintEventArgs e)
         {

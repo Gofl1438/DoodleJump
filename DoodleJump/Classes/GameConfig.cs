@@ -241,6 +241,12 @@ namespace DoodleJump.Classes
             }
         }
 
+        public static class CameraSpeeds
+        {
+            public static readonly int FallDeath = CanvasParameters.Height / 15;
+            public static readonly int FallDeathSceneTwo = CanvasParameters.Height / 70;
+            public static readonly int MonsterDeath = CanvasParameters.Height / 70;
+        }
 
         public static class Probabilities
         {
