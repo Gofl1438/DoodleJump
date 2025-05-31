@@ -8,7 +8,6 @@ namespace DoodleJump
         Player player;
         Rectangle workingArea;
         System.Timers.Timer timer;
-        GameState gameState;
         public MainForm()
         {
             InitializeComponent();
@@ -92,7 +91,6 @@ namespace DoodleJump
                 else
                 {
                     GameManagerObjectCanvas.MaintainPlatformsCount();
-                    this.Text = "Doodle Jump: Score - " + GameState.Score;
                     GameManagerObjectCanvas.DeleteTouchObject();
                     GameManagerObjectCanvas.ClearObjectCanvas();
                     player.Physics.ApplyPhysics();
@@ -109,7 +107,7 @@ namespace DoodleJump
 
         private void InitializeGameState()
         {
-            gameState = new GameState();
+            GameState gameState = new GameState();
         }
 
         private void OnRepaint(object sender, PaintEventArgs e)
@@ -147,6 +145,7 @@ namespace DoodleJump
                         GameManagerUI.elementInterface[i].DrawSprite(g);
                     }
                 }
+                DrawScore(g);
                 if (GameState.isDoodleFrozen)
                 {
                     for (int i = 0; i < GameManagerUI.elementPause.Count; i++)
@@ -167,6 +166,14 @@ namespace DoodleJump
                 }
             }
         }
+        private void DrawScore(Graphics g)
+        {
+            g.DrawString(GameState.Score.ToString(),
+                GameConfig.GameUiConfig.Dimensions.ScoreFont,
+                GameConfig.GameUiConfig.CustomBrush,
+                GameConfig.GameUiConfig.Positions.Score
+                );
+        }
 
         private void FollowPlayer()
         {
@@ -178,6 +185,7 @@ namespace DoodleJump
                 float offset = halfScreenHeight - playerY;
                 MoveAllObjects(offset);
                 player.Physics.transform.Position.Y += offset;
+                GameState.Score += (int)offset;
             }
         }
         private void MoveAllObjects(float offset)
