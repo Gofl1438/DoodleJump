@@ -8,6 +8,10 @@ namespace DoodleJump
         Player player;
         Rectangle workingArea;
         System.Timers.Timer timer;
+
+        /// <summary>
+        /// Конструктор главной формы.
+        /// </summary>
         public MainForm()
         {
             InitializeComponent();
@@ -20,6 +24,10 @@ namespace DoodleJump
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
         }
+
+        /// <summary>
+        /// Выполняет калибровку размеров главного окна в соответствии с рабочей областью экрана.
+        /// </summary>
         private void СalibrationSize()
         {
             workingArea = Screen.FromControl(this).WorkingArea;
@@ -29,12 +37,21 @@ namespace DoodleJump
             GameConfig.Initialize(new Size(doodleCanvas.Size.Width, doodleCanvas.Size.Height));
         }
 
+        /// <summary>
+        /// Обработчик события срабатывания таймера.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             Update(this, EventArgs.Empty);
         }
 
-
+        /// <summary>
+        /// Обрабатывает отпускание клавиши, останавливает движение и меняет спрайт игрока.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnKeyBoardUp(object sender, KeyEventArgs e)
         {
             player.Physics.dx = 0;
@@ -44,6 +61,11 @@ namespace DoodleJump
             }
         }
 
+        /// <summary>
+        /// Осуществляет обработку и реагирование на события нажатия клавиш.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnKeyBoardPressed(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode.ToString())
@@ -74,6 +96,12 @@ namespace DoodleJump
                     break;
             }
         }
+
+        /// <summary>
+        /// Обрабатывает обновление игровой логики и физики.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Update(object sender, EventArgs e)
         {
             if (!GameState.IsSceneMenu)
@@ -104,12 +132,19 @@ namespace DoodleJump
             }
         }
 
-
+        /// <summary>
+        /// Реализует сброс всех значений состояния до значений по умолчанию.
+        /// </summary>
         private void InitializeGameState()
         {
             GameState gameState = new GameState();
         }
 
+        /// <summary>
+        /// Реализует отрисовку всех игровых объектов.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnRepaint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
@@ -166,6 +201,11 @@ namespace DoodleJump
                 }
             }
         }
+
+        /// <summary>
+        /// Реализует отрисовку очков.
+        /// </summary>
+        /// <param name="g"></param>
         private void DrawScore(Graphics g)
         {
             g.DrawString(GameState.Score.ToString(),
@@ -175,6 +215,9 @@ namespace DoodleJump
                 );
         }
 
+        /// <summary>
+        /// Реализует стандартное перемещение камеры при прыжке главного героя.
+        /// </summary>
         private void FollowPlayer()
         {
             float playerY = player.Physics.transform.Position.Y;
@@ -188,6 +231,10 @@ namespace DoodleJump
                 GameState.Score += (int)offset;
             }
         }
+        /// <summary>
+        /// Реализует перемещение каждого объекта при прыжке главного героя.
+        /// </summary>
+        /// <param name="offset"></param>
         private void MoveAllObjects(float offset)
         {
             for (int i = GameManagerObjectCanvas.objectCanvas.Count - 1; i >= 0; i--)
@@ -198,7 +245,7 @@ namespace DoodleJump
         }
 
         /// <summary>
-        /// Перемещение камеры при столкновении с чудищем
+        /// Реализует проигрышное перемещение камеры при столкновении с монстром.
         /// </summary>
         private void FollowMonsterDeath()
         {
@@ -223,7 +270,7 @@ namespace DoodleJump
         }
 
         /// <summary>
-        /// Перемещении камеры при "глубоком падении"
+        /// Реализует первичное проигрышное перемещение камеры при глубоком падении за пределы экрана.
         /// </summary>
         private void FollowFallDeath()
         {
@@ -248,7 +295,7 @@ namespace DoodleJump
         }
 
         /// <summary>
-        /// Вторая сцена проигрыша при "глубоком падении"
+        /// Реализует вторичное проигрышное перемещение камеры при глубоком падении за пределы экрана.
         /// </summary>
         private void FollowFallDeathSceneTwo()
         {
@@ -269,7 +316,9 @@ namespace DoodleJump
             }
         }
 
-
+        /// <summary>
+        /// Выполняет расчёт и добавление объектов (мячей) в специализированный класс.
+        /// </summary>
         private void AddBallList()
         {
             int posY = (int)player.Physics.transform.Position.Y;
@@ -278,7 +327,11 @@ namespace DoodleJump
             GameManagerObjectCanvas.ball.Add(ball);
         }
 
-
+        /// <summary>
+        /// Обрабатывает взаимодействие пользователя с интерфейсом посредством нажатий мыши.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void doodleCanvas_MouseDown(object sender, MouseEventArgs e)
         {
             if (GameState.IsSceneMenu)
@@ -331,6 +384,9 @@ namespace DoodleJump
             }
         }
 
+        /// <summary>
+        /// Реализиует рестарт игры.
+        /// </summary>
         private void RestartGame()
         {
             GameManagerObjectCanvas.AllClearObject();
@@ -338,6 +394,9 @@ namespace DoodleJump
             player = new Player();
         }
 
+        /// <summary>
+        /// Реализует остановку игрового процесса.
+        /// </summary>
         private void ApplyPause()
         {
             if (!GameState.isDoodleFrozen)
