@@ -11,12 +11,40 @@ namespace DoodleJump.Classes
         public enum PlatformType { Blue, Brown, Green, White }
         public enum MonstrumType { Red }
 
+        public static readonly int DifficultyCoefficient = 500;//
         public static Size CanvasParameters { get; private set; }
         public static readonly int PaddingCanvas = 20;
-        public static readonly int DifficultyCoefficient = 500;
         public static void Initialize(Size canvasSize)
         {
             CanvasParameters = canvasSize;
+            InitializePauseMenu(canvasSize);
+            InitializeGameOverScreen(canvasSize);
+            InitializeMainMenu(canvasSize);
+        }
+
+        private static void InitializePauseMenu(Size canvasSize)
+        {
+            PauseMenuConfig.WidthBackground = CanvasParameters.Width;
+            PauseMenuConfig.HeightBackground = CanvasParameters.Height;
+            PauseMenuConfig.OxButtonResume = (CanvasParameters.Width - PauseMenuConfig.WidthButtonResume) / 2;
+            PauseMenuConfig.OyButtonResume = CanvasParameters.Height - PauseMenuConfig.HeightButtonResume - PauseMenuConfig.OffsetDownButtonResume;
+        }
+
+        private static void InitializeGameOverScreen(Size canvasSize)
+        {
+            GameOverConfig.OxTitleGameOver = (CanvasParameters.Width - GameOverConfig.WidthTitleGameOver) / 2;
+            GameOverConfig.OyButtonMenu = CanvasParameters.Height - PauseMenuConfig.HeightButtonResume - GameOverConfig.OffsetDownButtonMenu;
+            GameOverConfig.OxButtonAgainPlay = (CanvasParameters.Width - PauseMenuConfig.WidthButtonResume) / 2;
+            GameOverConfig.OyButtonAgainPlay = CanvasParameters.Height - PauseMenuConfig.HeightButtonResume - GameOverConfig.OffsetDownButtonAgainPlay;
+        }
+
+        private static void InitializeMainMenu(Size canvasSize)
+        {
+
+            MainMenuConfig.OxTitleDoodleJump = (CanvasParameters.Width - MainMenuConfig.WidthTitleDoodleJump) / 2;
+            MainMenuConfig.OxButtonStartPlay = (CanvasParameters.Width - MainMenuConfig.WidthButtonStartPlay) / 2;
+            MainMenuConfig.OyButtonStartPlay = CanvasParameters.Height - MainMenuConfig.OffsetDownButtonStartPlay;
+            MainMenuConfig.OyBackgroundError = CanvasParameters.Height - MainMenuConfig.HeightBackgroundError;
         }
 
         /// <summary>
@@ -99,7 +127,6 @@ namespace DoodleJump.Classes
             public static readonly int Speed = 15;
             public static readonly Bitmap Sprite = Properties.Resources.Ball;
         }
-
 
         /// <summary>
         /// Игровой интерфейс
@@ -250,13 +277,14 @@ namespace DoodleJump.Classes
 
         public static class Probabilities
         {
-            public static float Spring = 0.6f;
-            public static float Monstrum = 0.4f;
+            public static float Spring = 0.08f;
+            public static float Monstrum = 0.05f;
 
             public static float BlueStart = 0.1f;
             public static float BrownStart = 0.3f;
             public static float GreenStart = 0.6f;
             public static float WhiteStart = 0f;
+
 
             public static float BlueScoreFactor = 0.01f;
             public static float BrownScoreFactor = -0.01f;
