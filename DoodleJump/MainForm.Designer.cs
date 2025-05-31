@@ -111,6 +111,8 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Form1";
             WindowState = FormWindowState.Maximized;
+            KeyDown += OnKeyBoardPressed;
+            KeyUp += OnKeyBoardUp;
             tableLayoutPanel1.ResumeLayout(false);
             panel3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)doodleCanvas).EndInit();

@@ -20,8 +20,6 @@ namespace DoodleJump
             timer.SynchronizingObject = this;
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
-            this.KeyDown += new KeyEventHandler(OnKeyBoardPressed);
-            this.KeyUp += new KeyEventHandler(OnKeyBoardUp);
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -84,6 +82,7 @@ namespace DoodleJump
 
         private void Update(object sender, EventArgs e)
         {
+
         }
 
         private void OnRepaint(object sender, PaintEventArgs e)

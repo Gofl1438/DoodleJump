@@ -9,8 +9,10 @@ namespace DoodleJump.Classes
     public class GameState
     {
         public static int Score;
+        public static int CurrentMinPlatformBlock;
         public GameState()
         {
+            CurrentMinPlatformBlock = GameConfig.PlatformConfig.MinInitialQuantityInBlock;
             Score = 0;
         }
     }
