@@ -82,13 +82,22 @@ namespace DoodleJump
 
         private void Update(object sender, EventArgs e)
         {
-
+            GameManagerObjectCanvas.GenerateStartSequence();
+            player.Physics.ApplyPhysics();
+            doodleCanvas.Invalidate();
         }
 
         private void OnRepaint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             player.DrawSprite(g);
+            if (GameManagerObjectCanvas.objectCanvas.Count > 0)
+            {
+                for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
+                {
+                    GameManagerObjectCanvas.objectCanvas[i].DrawSprite(g);
+                }
+            }
             doodleCanvas.Invalidate();
         }
     }
