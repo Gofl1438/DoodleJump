@@ -1,5 +1,7 @@
 using DoodleJump.Classes;
+using System.Reflection;
 using System.Timers;
+using System.Windows.Forms;
 
 namespace DoodleJump
 {
@@ -7,7 +9,7 @@ namespace DoodleJump
     {
         Player player;
         Rectangle workingArea;
-        System.Timers.Timer timer;
+        System.Windows.Forms.Timer timer;
 
         /// <summary>
         /// Конструктор главной формы.
@@ -18,10 +20,9 @@ namespace DoodleJump
             СalibrationSize();
             InitializeGameState();
             GameManagerUI.AppendElementInterface();
-            timer = new System.Timers.Timer(15);
-            timer.AutoReset = true;
-            timer.SynchronizingObject = this;
-            timer.Elapsed += Timer_Elapsed;
+            timer = new System.Windows.Forms.Timer();
+            timer.Interval = 15;
+            timer.Tick += Update;
             timer.Start();
         }
 
@@ -38,26 +39,20 @@ namespace DoodleJump
         }
 
         /// <summary>
-        /// Обработчик события срабатывания таймера.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            Update(this, EventArgs.Empty);
-        }
-
-        /// <summary>
         /// Обрабатывает отпускание клавиши, останавливает движение и меняет спрайт игрока.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OnKeyBoardUp(object sender, KeyEventArgs e)
         {
-            player.Physics.dx = 0;
-            if (e.KeyCode == Keys.Up)
+            if (player != null)
             {
-                player.Sprite = GameConfig.Player.Sprites.Right;
+                player.Physics.dx = 0;
+                GameState.IsWasShoot = false;
+                if (e.KeyCode == Keys.Up)
+                {
+                    player.Sprite = GameConfig.Player.Sprites.Right;
+                }
             }
         }
 
@@ -68,32 +63,39 @@ namespace DoodleJump
         /// <param name="e"></param>
         private void OnKeyBoardPressed(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode.ToString())
+            if (player != null)
             {
-                case "Right":
-                case "D":
-                    player.Physics.dx = GameConfig.Player.MovingOx;
-                    if (player.Sprite != GameConfig.Player.Sprites.Right)
-                    {
-                        player.Sprite = GameConfig.Player.Sprites.Right;
-                    }
-                    break;
-                case "Left":
-                case "A":
-                    player.Physics.dx = -GameConfig.Player.MovingOx;
-                    if (player.Sprite != GameConfig.Player.Sprites.Left)
-                    {
-                        player.Sprite = GameConfig.Player.Sprites.Left;
-                    }
-                    break;
-                case "Up":
-                case "W":
-                    if (player.Sprite != GameConfig.Player.Sprites.Up)
-                    {
-                        player.Sprite = GameConfig.Player.Sprites.Up;
-                    }
-                    AddBallList();
-                    break;
+                switch (e.KeyCode.ToString())
+                {
+                    case "Right":
+                    case "D":
+                        player.Physics.dx = GameConfig.Player.MovingOx;
+                        if (player.Sprite != GameConfig.Player.Sprites.Right)
+                        {
+                            player.Sprite = GameConfig.Player.Sprites.Right;
+                        }
+                        break;
+                    case "Left":
+                    case "A":
+                        player.Physics.dx = -GameConfig.Player.MovingOx;
+                        if (player.Sprite != GameConfig.Player.Sprites.Left)
+                        {
+                            player.Sprite = GameConfig.Player.Sprites.Left;
+                        }
+                        break;
+                    case "Up":
+                    case "W":
+                        if (!GameState.IsWasShoot && !GameState.IsFallDeath && !GameState.isDoodleFrozen && !GameState.IsMonsterDeath)
+                        {
+                            GameState.IsWasShoot = true;
+                            if (player.Sprite != GameConfig.Player.Sprites.Up)
+                            {
+                                player.Sprite = GameConfig.Player.Sprites.Up;
+                            }
+                            AddBallList();
+                        }
+                        break;
+                }
             }
         }
 
@@ -118,16 +120,16 @@ namespace DoodleJump
                 }
                 else
                 {
-                    GameManagerObjectCanvas.MaintainPlatformsCount();
-                    GameManagerObjectCanvas.DeleteTouchObject();
-                    GameManagerObjectCanvas.ClearObjectCanvas();
                     player.Physics.ApplyPhysics();
+                    GameManagerObjectCanvas.DeleteTouchObject();
+                    GameManagerObjectCanvas.MaintainPlatformsCount();
+                    GameManagerObjectCanvas.ClearObjectCanvas();
                     FollowPlayer();
                 }
-                GameManagerObjectCanvas.ClearBall();
+                player.Physics.WrapHorizontalPosition(doodleCanvas);
                 GameManagerObjectCanvas.ApplyPhysicsObject();
                 GameManagerObjectCanvas.ApplyPhysicsBall();
-                player.Physics.WrapHorizontalPosition(doodleCanvas);
+                GameManagerObjectCanvas.ClearBall();
                 doodleCanvas.Invalidate();
             }
         }
@@ -158,27 +160,18 @@ namespace DoodleJump
             }
             else
             {
-                if (GameManagerObjectCanvas.objectCanvas.Count > 0)
+                for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
                 {
-                    for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
-                    {
-                        GameManagerObjectCanvas.objectCanvas[i].DrawSprite(g);
-                    }
+                    GameManagerObjectCanvas.objectCanvas[i].DrawSprite(g);
                 }
-                if (GameManagerObjectCanvas.ball.Count > 0)
+                for (int i = 0; i < GameManagerObjectCanvas.ball.Count; i++)
                 {
-                    for (int i = 0; i < GameManagerObjectCanvas.ball.Count; i++)
-                    {
-                        GameManagerObjectCanvas.ball[i].DrawSprite(g);
-                    }
+                    GameManagerObjectCanvas.ball[i].DrawSprite(g);
                 }
                 player.DrawSprite(g);
-                if (GameManagerUI.elementInterface.Count > 0)
+                for (int i = 0; i < GameManagerUI.elementInterface.Count; i++)
                 {
-                    for (int i = 0; i < GameManagerUI.elementInterface.Count; i++)
-                    {
-                        GameManagerUI.elementInterface[i].DrawSprite(g);
-                    }
+                    GameManagerUI.elementInterface[i].DrawSprite(g);
                 }
                 DrawScore(g);
                 if (GameState.isDoodleFrozen)
@@ -353,6 +346,7 @@ namespace DoodleJump
                         GameState.IsMonsterDeath = false;
                         GameState.IsFallDeath = false;
                         GameState.IsFallDeathSceneTwo = false;
+                        GameState.Score = 0;
                         timer.Start();
                     }
                     if (new Rectangle(GameConfig.GameOverConfig.Positions.ButtonMenu, GameConfig.GameOverConfig.Dimensions.ButtonMenu).Contains(e.Location))
@@ -383,12 +377,14 @@ namespace DoodleJump
                 }
             }
         }
+        
 
         /// <summary>
         /// Реализиует рестарт игры.
         /// </summary>
         private void RestartGame()
         {
+
             GameManagerObjectCanvas.AllClearObject();
             GameManagerObjectCanvas.GenerateStartSequence(); ///возможно нужно посмотреть на логику, то есть обнулить логику появления платформ!!!
             player = new Player();
@@ -409,5 +405,6 @@ namespace DoodleJump
                 timer.Start();
             }
         }
+
     }
 }
