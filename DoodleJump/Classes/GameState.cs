@@ -8,8 +8,8 @@ namespace DoodleJump.Classes
 {
     public class GameState
     {
-        public static bool isDoodleFrozen;
-        public static bool IsScenePause;
+        public static bool IsDoodleFrozen;
+        public static bool IsScenePaused;
         public static bool IsMonsterDeath;
         public static bool IsFallDeath;
         public static bool IsFallDeathSceneTwo;
@@ -22,8 +22,8 @@ namespace DoodleJump.Classes
         {
             Score = 0;
             CurrentMinPlatformBlock = GameConfig.PlatformConfig.MinInitialQuantityInBlock;
-            isDoodleFrozen = false;
-            IsScenePause = false;
+            IsDoodleFrozen = false;
+            IsScenePaused = false;
             IsMonsterDeath = false;
             IsFallDeath = false;
             IsFallDeathSceneTwo = false;

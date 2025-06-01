@@ -6,141 +6,259 @@ using System.Threading.Tasks;
 
 namespace DoodleJump.Classes
 {
+    /// <summary>
+    /// Класс, реализующий физику игрока.
+    /// </summary>
     public class PhysicsPlayer
     {
-        public Transform transform;
-        public float gravity;
-        private float acceleration;
-        public float dx;
-        public PhysicsPlayer(Transform transform)
+        private Transform _transform;
+        private float _gravity;
+        private float _acceleration;
+        private float _dx;
+
+        /// <summary>
+        /// Трансформация игрока (позиция и размер).
+        /// </summary>
+        public Transform Transform
         {
-            this.transform = transform;
-            gravity = GameConfig.Player.DefaultGrafity;
-            acceleration = GameConfig.Player.Acceleration;
-            dx = 0;
+            get => _transform;
+            set => _transform = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         /// <summary>
-        /// Применение всей описанной физики
+        /// Текущее значение гравитации (скорость по оси Y).
+        /// </summary>
+        public float Gravity
+        {
+            get => _gravity;
+            set => _gravity = value;
+        }
+
+        /// <summary>
+        /// Скорость перемещения по оси X.
+        /// </summary>
+        public float Dx
+        {
+            get => _dx;
+            set => _dx = value;
+        }
+
+        /// <summary>
+        /// Конструктор класса PhysicsPlayer.
+        /// </summary>
+        /// <param name="transform">Трансформация игрока</param>
+        public PhysicsPlayer(Transform transform)
+        {
+            Transform = transform;
+            Gravity = GameConfig.Player.DefaultGravity;
+            _acceleration = GameConfig.Player.Acceleration;
+            Dx = 0;
+        }
+
+        /// <summary>
+        /// Применяет всю физику игрока за один кадр.
         /// </summary>
         public void ApplyPhysics()
         {
             MoveOx();
-            transform.Position.Y += gravity;
-            gravity += acceleration;
+            ApplyGravity();
             CollideWithObject();
         }
 
+
         /// <summary>
-        /// Перемещение по Ox
+        /// Перемещает игрока по горизонтали.
         /// </summary>
         public void MoveOx()
         {
-            transform.Position.X += dx;
+            Transform.Position.X += Dx;
         }
 
         /// <summary>
-        /// Расчёт столковений с объектами
+        /// Применяет гравитацию к игроку.
+        /// </summary>
+        private void ApplyGravity()
+        {
+            Transform.Position.Y += Gravity;
+            Gravity += _acceleration;
+        }
+
+        /// <summary>
+        /// Обрабатывает столкновения с игровыми объектами.
         /// </summary>
         public void CollideWithObject()
         {
-            if (transform.Position.Y > GameConfig.CanvasParameters.Height)
+            CheckFallDeath();
+
+            var playerRect = GetBoundingBox(Transform);
+            int lengthTrunk = GameConfig.Player.Dimensions.LengthTrunk;
+
+            foreach (var obj in GameManagerObjectCanvas.Objects)
+            {
+                var objRect = GetBoundingBox(obj.Transform);
+
+                if (!CheckHorizontalCollision(playerRect, objRect, lengthTrunk))
+                    continue;
+
+                ProcessCollisionWithObject(obj);
+            }
+        }
+
+        /// <summary>
+        /// Проверяет выход за нижнюю границу экрана.
+        /// </summary>
+        private void CheckFallDeath()
+        {
+            if (Transform.Position.Y > GameConfig.CanvasParameters.Height)
             {
                 GameState.IsFallDeath = true;
-                return;
             }
-            int LengthTrunk = GameConfig.Player.Dimensions.LengthTrunk;
-            float OxPlayer = transform.Position.X;
-            float OyPlayer = transform.Position.Y;
-            int WidthPlayer = transform.Size.Width;
-            int HeightPlayer = transform.Size.Height;
+        }
 
-            foreach (var obj in GameManagerObjectCanvas.objectCanvas)
+
+        /// <summary>
+        /// Обрабатывает столкновение с конкретным объектом.
+        /// </summary>
+        /// <param name="obj">Игровой объект</param>
+        private void ProcessCollisionWithObject(ObjectGame obj)
+        {
+            switch (obj)
             {
-                float OxObj = obj.Transform.Position.X;
-                float OyObj = obj.Transform.Position.Y;
-                int WidthObj = obj.Transform.Size.Width;
-                int HeightObj = obj.Transform.Size.Height;
+                case Platform platform when Gravity > 0:
+                    HandlePlatformCollision(platform);
+                    break;
 
-                bool isColliding = OxPlayer + LengthTrunk <= OxObj + WidthObj && OxPlayer + WidthPlayer - LengthTrunk >= OxObj;
-                if (!isColliding) continue;
+                case Monstrum monstrum:
+                    HandleMonsterCollision(monstrum);
+                    break;
 
-                switch (obj)
+                case Spring spring when Gravity > 0:
+                    HandleSpringCollision(spring);
+                    break;
+            }
+        }
+
+
+        /// <summary>
+        /// Обрабатывает столкновение с платформой.
+        /// </summary>
+        private void HandlePlatformCollision(Platform platform)
+        {
+            if (IsPlayerOnTop(platform.Transform))
+            {
+                switch (platform.Type)
                 {
-                    case Platform platform when gravity > 0:
-                        if (OyPlayer + HeightPlayer >= OyObj && OyPlayer + HeightPlayer <= OyObj + HeightObj / 2)
-                        {
-                            switch (platform.Type)
-                            {
-                                case GameConfig.PlatformType.White:
-                                    AddForce();
-                                    platform.IsTouchedByPlayer = true;
-                                    break;
-                                case GameConfig.PlatformType.Brown:
-                                    platform.IsTouchedByPlayer = true;
-                                    break;
-                                default:
-                                    AddForce();
-                                    break;
-                            }
-                        }
+                    case GameConfig.PlatformType.White:
+                        AddForce();
+                        platform.IsTouchedByPlayer = true;
                         break;
-                    case Monstrum monstrum:
-                        if (gravity > 0)
-                        {
-                            if (OyPlayer + HeightPlayer > OyObj)
-                            {
-                                if (OyPlayer + HeightPlayer < OyObj + HeightObj / 2)
-                                {
-                                    obj.IsTouchedByPlayer = true;
-                                    AddForce();
-                                }
-                                else if (OyPlayer + HeightPlayer < OyObj + HeightObj)
-                                {
-                                    GameState.IsMonsterDeath = true;
-                                }
-                            }
-                        }
-                        else if (gravity < 0)
-                        {
-                            if ((OyPlayer + LengthTrunk <= OyObj + HeightObj) && (OyPlayer + LengthTrunk >= OyObj))
-                            {
-                                GameState.IsMonsterDeath = true;
-                            }
-                        }
+                    case GameConfig.PlatformType.Brown:
+                        platform.IsTouchedByPlayer = true;
                         break;
-                    case Spring spring when gravity > 0:
-                        if (OyPlayer + HeightPlayer >= OyObj && OyPlayer + HeightPlayer <= OyObj + HeightObj / 2)
-                        {
-                            gravity = GameConfig.Spring.Gravity;
-                        }
+                    default:
+                        AddForce();
                         break;
                 }
             }
         }
 
         /// <summary>
-        /// Сброс грвитации до дефолтного значения
+        /// Обрабатывает столкновение с монстром.
+        /// </summary>
+        private void HandleMonsterCollision(Monstrum monstrum)
+        {
+            if (Gravity > 0)
+            {
+                if (IsPlayerOnTop(monstrum.Transform, 0.5f))
+                {
+                    monstrum.IsTouchedByPlayer = true;
+                    AddForce();
+                }
+                else if (IsPlayerInsideMonster(monstrum.Transform))
+                {
+                    GameState.IsMonsterDeath = true;
+                }
+            }
+            else if (Gravity < 0)
+            {
+                if (IsPlayerHittingFromBelow(monstrum.Transform))
+                {
+                    GameState.IsMonsterDeath = true;
+                }
+            }
+        }
+
+        // <summary>
+        /// Обрабатывает столкновение с пружиной.
+        /// </summary>
+        private void HandleSpringCollision(Spring spring)
+        {
+            if (IsPlayerOnTop(spring.Transform))
+            {
+                Gravity = GameConfig.Spring.Gravity;
+            }
+        }
+
+        /// <summary>
+        /// Сбрасывает гравитацию до начального значения.
         /// </summary>
         public void AddForce()
         {
-            gravity = GameConfig.Player.DefaultGrafity;
+            Gravity = GameConfig.Player.DefaultGravity;
         }
 
+
+        /// <summary>
+        /// Обеспечивает "заворачивание" игрока при выходе за горизонтальные границы.
+        /// </summary>
+        /// <param name="doodleCanvas">Canvas, на котором отрисовывается игрок</param>
         public void WrapHorizontalPosition(PictureBox doodleCanvas)
         {
-            float halfWidth = transform.Size.Width * 0.5f;
+            float halfWidth = Transform.Size.Width * 0.5f;
             float canvasWidth = doodleCanvas.Width;
-            float currentX = transform.Position.X;
+            float currentX = Transform.Position.X;
 
             if (currentX + halfWidth > canvasWidth)
             {
-                transform.Position.X = -halfWidth;
+                Transform.Position.X = -halfWidth;
             }
             else if (currentX < -halfWidth)
             {
-                transform.Position.X = canvasWidth - halfWidth;
+                Transform.Position.X = canvasWidth - halfWidth;
             }
+        }
+
+        private RectangleF GetBoundingBox(Transform transform)
+        {
+            return new RectangleF(
+                transform.Position.X,
+                transform.Position.Y,
+                transform.Size.Width,
+                transform.Size.Height);
+        }
+
+        private bool CheckHorizontalCollision(RectangleF playerRect, RectangleF objRect, int lengthTrunk)
+        {
+            return playerRect.Right - lengthTrunk > objRect.Left &&
+                   playerRect.Left + lengthTrunk < objRect.Right;
+        }
+
+        private bool IsPlayerOnTop(Transform objTransform, float heightFactor = 1f)
+        {
+            return Transform.Position.Y + Transform.Size.Height >= objTransform.Position.Y &&
+                   Transform.Position.Y + Transform.Size.Height <= objTransform.Position.Y + objTransform.Size.Height * heightFactor;
+        }
+
+        private bool IsPlayerInsideMonster(Transform monsterTransform)
+        {
+            return Transform.Position.Y + Transform.Size.Height > monsterTransform.Position.Y + monsterTransform.Size.Height * 0.5f &&
+                   Transform.Position.Y + Transform.Size.Height < monsterTransform.Position.Y + monsterTransform.Size.Height;
+        }
+
+        private bool IsPlayerHittingFromBelow(Transform monsterTransform)
+        {
+            return Transform.Position.Y + Transform.Size.Height <= monsterTransform.Position.Y + monsterTransform.Size.Height &&
+                   Transform.Position.Y + Transform.Size.Height >= monsterTransform.Position.Y;
         }
     }
 }

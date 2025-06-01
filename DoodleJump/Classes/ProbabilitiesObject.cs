@@ -7,9 +7,18 @@ using static DoodleJump.Classes.GameConfig;
 
 namespace DoodleJump.Classes
 {
+    /// <summary>
+    /// Статический класс для управления вероятностями появления игровых объектов.
+    /// </summary>
     public static class ProbabilitiesObject
     {
         private static Random rand = new Random();
+
+        /// <summary>
+        /// Получает случайный тип платформы на основе вероятностей.
+        /// </summary>
+        /// <param name="WithBrown"></param>
+        /// <returns></returns>
         public static GameConfig.PlatformType GetTypePlatform(bool WithBrown = false)
         {
             Dictionary<GameConfig.PlatformType, float> probabilities;
@@ -34,6 +43,9 @@ namespace DoodleJump.Classes
             return GameConfig.PlatformType.Green;
         }
 
+        /// <summary>
+        /// Возвращает вероятности появления платформ без учета коричневых.
+        /// </summary>
         private static Dictionary<GameConfig.PlatformType, float> GetPlatformProbabilitiesWithoutBrown()
         {
             Dictionary<GameConfig.PlatformType, float> probabilities = GetCurrentProbabilities();
@@ -52,6 +64,9 @@ namespace DoodleJump.Classes
             return normalizedProbabilities;
         }
 
+        /// <summary>
+        /// Рассчитывает текущие вероятности появления платформ на основе счета игрока
+        /// </summary>
         private static Dictionary<PlatformType, float> GetCurrentProbabilities()
         {
             float scoreMultiplier = GameState.Score / GameConfig.DifficultyCoefficient;

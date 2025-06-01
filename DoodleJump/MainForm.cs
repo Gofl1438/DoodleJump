@@ -1,4 +1,6 @@
 using DoodleJump.Classes;
+using Microsoft.Win32;
+using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows.Forms;
@@ -19,7 +21,7 @@ namespace DoodleJump
             InitializeComponent();
             СalibrationSize();
             InitializeGameState();
-            GameManagerUI.AppendElementInterface();
+            GameManagerUI.InitializeAllUI();
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 15;
             timer.Tick += Update;
@@ -29,7 +31,7 @@ namespace DoodleJump
         /// <summary>
         /// Выполняет калибровку размеров главного окна в соответствии с рабочей областью экрана.
         /// </summary>
-        private void СalibrationSize()
+        private void СalibrationSize() 
         {
             workingArea = Screen.FromControl(this).WorkingArea;
             this.Height = workingArea.Height;
@@ -47,7 +49,7 @@ namespace DoodleJump
         {
             if (player != null)
             {
-                player.Physics.dx = 0;
+                player.Physics.Dx = 0;
                 GameState.IsWasShoot = false;
                 if (e.KeyCode == Keys.Up)
                 {
@@ -69,7 +71,7 @@ namespace DoodleJump
                 {
                     case "Right":
                     case "D":
-                        player.Physics.dx = GameConfig.Player.MovingOx;
+                        player.Physics.Dx = GameConfig.Player.MovingOx;
                         if (player.Sprite != GameConfig.Player.Sprites.Right)
                         {
                             player.Sprite = GameConfig.Player.Sprites.Right;
@@ -77,7 +79,7 @@ namespace DoodleJump
                         break;
                     case "Left":
                     case "A":
-                        player.Physics.dx = -GameConfig.Player.MovingOx;
+                        player.Physics.Dx = -GameConfig.Player.MovingOx;
                         if (player.Sprite != GameConfig.Player.Sprites.Left)
                         {
                             player.Sprite = GameConfig.Player.Sprites.Left;
@@ -85,7 +87,7 @@ namespace DoodleJump
                         break;
                     case "Up":
                     case "W":
-                        if (!GameState.IsWasShoot && !GameState.IsFallDeath && !GameState.isDoodleFrozen && !GameState.IsMonsterDeath)
+                        if (!GameState.IsWasShoot && !GameState.IsFallDeath && !GameState.IsDoodleFrozen && !GameState.IsMonsterDeath)
                         {
                             GameState.IsWasShoot = true;
                             if (player.Sprite != GameConfig.Player.Sprites.Up)
@@ -123,7 +125,7 @@ namespace DoodleJump
                     player.Physics.ApplyPhysics();
                     GameManagerObjectCanvas.DeleteTouchObject();
                     GameManagerObjectCanvas.MaintainPlatformsCount();
-                    GameManagerObjectCanvas.ClearObjectCanvas();
+                    GameManagerObjectCanvas.RemoveOffScreenObjects();
                     FollowPlayer();
                 }
                 player.Physics.WrapHorizontalPosition(doodleCanvas);
@@ -132,6 +134,7 @@ namespace DoodleJump
                 GameManagerObjectCanvas.ClearBall();
                 doodleCanvas.Invalidate();
             }
+            doodleCanvas.Invalidate();
         }
 
         /// <summary>
@@ -153,43 +156,43 @@ namespace DoodleJump
 
             if (GameState.IsSceneMenu)
             {
-                for (int i = 0; i < GameManagerUI.elementStartMenu.Count; i++)
+                for (int i = 0; i < GameManagerUI.MainMenuElements.Count; i++)
                 {
-                    GameManagerUI.elementStartMenu[i].DrawSprite(g);
+                    GameManagerUI.MainMenuElements[i].DrawSprite(g);
                 }
             }
             else
             {
-                for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
+                for (int i = 0; i < GameManagerObjectCanvas.Objects.Count; i++)
                 {
-                    GameManagerObjectCanvas.objectCanvas[i].DrawSprite(g);
+                    GameManagerObjectCanvas.Objects[i].DrawSprite(g);
                 }
-                for (int i = 0; i < GameManagerObjectCanvas.ball.Count; i++)
+                for (int i = 0; i < GameManagerObjectCanvas.ActiveBalls.Count; i++)
                 {
-                    GameManagerObjectCanvas.ball[i].DrawSprite(g);
+                    GameManagerObjectCanvas.ActiveBalls[i].DrawSprite(g);
                 }
                 player.DrawSprite(g);
-                for (int i = 0; i < GameManagerUI.elementInterface.Count; i++)
+                for (int i = 0; i < GameManagerUI.InterfaceElements.Count; i++)
                 {
-                    GameManagerUI.elementInterface[i].DrawSprite(g);
+                    GameManagerUI.InterfaceElements[i].DrawSprite(g);
                 }
                 DrawScore(g);
-                if (GameState.isDoodleFrozen)
+                if (GameState.IsDoodleFrozen)
                 {
-                    for (int i = 0; i < GameManagerUI.elementPause.Count; i++)
+                    for (int i = 0; i < GameManagerUI.PauseMenuElements.Count; i++)
                     {
-                        GameManagerUI.elementPause[i].DrawSprite(g);
+                        GameManagerUI.PauseMenuElements[i].DrawSprite(g);
                     }
                     timer.Stop();
-                    GameState.IsScenePause = true;
+                    GameState.IsScenePaused = true;
                 }
                 if (GameState.IsSceneGameOver)
                 {
                     GameManagerObjectCanvas.AllClearObject();
                     doodleCanvas.Invalidate();
-                    for (int i = 0; i < GameManagerUI.elementGameOver.Count; i++)
+                    for (int i = 0; i < GameManagerUI.GameOverElements.Count; i++)
                     {
-                        GameManagerUI.elementGameOver[i].DrawSprite(g);
+                        GameManagerUI.GameOverElements[i].DrawSprite(g);
                     }
                 }
             }
@@ -213,14 +216,14 @@ namespace DoodleJump
         /// </summary>
         private void FollowPlayer()
         {
-            float playerY = player.Physics.transform.Position.Y;
+            float playerY = player.Physics.Transform.Position.Y;
             float halfScreenHeight = GameConfig.CanvasParameters.Height / 2f;
 
             if (playerY < halfScreenHeight)
             {
                 float offset = halfScreenHeight - playerY;
                 MoveAllObjects(offset);
-                player.Physics.transform.Position.Y += offset;
+                player.Physics.Transform.Position.Y += offset;
                 GameState.Score += (int)offset;
             }
         }
@@ -230,9 +233,9 @@ namespace DoodleJump
         /// <param name="offset"></param>
         private void MoveAllObjects(float offset)
         {
-            for (int i = GameManagerObjectCanvas.objectCanvas.Count - 1; i >= 0; i--)
+            for (int i = GameManagerObjectCanvas.Objects.Count - 1; i >= 0; i--)
             {
-                var obj = GameManagerObjectCanvas.objectCanvas[i];
+                var obj = GameManagerObjectCanvas.Objects[i];
                 obj.Transform.Position.Y += offset;
             }
         }
@@ -242,17 +245,17 @@ namespace DoodleJump
         /// </summary>
         private void FollowMonsterDeath()
         {
-            if (player.Physics.transform.Position.Y < GameConfig.CanvasParameters.Height)
+            if (player.Physics.Transform.Position.Y < GameConfig.CanvasParameters.Height)
             {
                 int offset = GameConfig.CameraSpeeds.MonsterDeath;
-                for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
+                for (int i = 0; i < GameManagerObjectCanvas.Objects.Count; i++)
                 {
-                    var plaform = GameManagerObjectCanvas.objectCanvas[i];
+                    var plaform = GameManagerObjectCanvas.Objects[i];
                     plaform.Transform.Position.Y -= (offset);
                 }
-                if (GameManagerObjectCanvas.objectCanvas[GameManagerObjectCanvas.objectCanvas.Count / 3].Transform.Position.Y < 0)
+                if (GameManagerObjectCanvas.Objects[GameManagerObjectCanvas.Objects.Count / 3].Transform.Position.Y < 0)
                 {
-                    player.Physics.transform.Position.Y += offset;
+                    player.Physics.Transform.Position.Y += offset;
                 }
             }
             else
@@ -267,17 +270,17 @@ namespace DoodleJump
         /// </summary>
         private void FollowFallDeath()
         {
-            if (player.Physics.transform.Position.Y < GameConfig.CanvasParameters.Height / 2)
+            if (player.Physics.Transform.Position.Y < GameConfig.CanvasParameters.Height / 2)
             {
                 GameState.IsFallDeathSceneTwo = true;
             }
-            if (GameConfig.CanvasParameters.Height / 2 < player.Physics.transform.Position.Y && !GameState.IsFallDeathSceneTwo)
+            if (GameConfig.CanvasParameters.Height / 2 < player.Physics.Transform.Position.Y && !GameState.IsFallDeathSceneTwo)
             {
                 int offset = GameConfig.CameraSpeeds.FallDeath;
-                player.Physics.transform.Position.Y -= offset;
-                for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
+                player.Physics.Transform.Position.Y -= offset;
+                for (int i = 0; i < GameManagerObjectCanvas.Objects.Count; i++)
                 {
-                    var plaform = GameManagerObjectCanvas.objectCanvas[i];
+                    var plaform = GameManagerObjectCanvas.Objects[i];
                     plaform.Transform.Position.Y -= (offset);
                 }
             }
@@ -292,13 +295,13 @@ namespace DoodleJump
         /// </summary>
         private void FollowFallDeathSceneTwo()
         {
-            if (player.Physics.transform.Position.Y < GameConfig.CanvasParameters.Height)
+            if (player.Physics.Transform.Position.Y < GameConfig.CanvasParameters.Height)
             {
                 int offset = GameConfig.CameraSpeeds.FallDeathSceneTwo;
-                player.Physics.transform.Position.Y += offset;
-                for (int i = 0; i < GameManagerObjectCanvas.objectCanvas.Count; i++)
+                player.Physics.Transform.Position.Y += offset;
+                for (int i = 0; i < GameManagerObjectCanvas.Objects.Count; i++)
                 {
-                    var plaform = GameManagerObjectCanvas.objectCanvas[i];
+                    var plaform = GameManagerObjectCanvas.Objects[i];
                     plaform.Transform.Position.Y -= (offset);
                 }
             }
@@ -314,10 +317,10 @@ namespace DoodleJump
         /// </summary>
         private void AddBallList()
         {
-            int posY = (int)player.Physics.transform.Position.Y;
-            int posX = (int)player.Physics.transform.Position.X;
+            int posY = (int)player.Physics.Transform.Position.Y;
+            int posX = (int)player.Physics.Transform.Position.X;
             Ball ball = new Ball(posX, posY);
-            GameManagerObjectCanvas.ball.Add(ball);
+            GameManagerObjectCanvas.ActiveBalls.Add(ball);
         }
 
         /// <summary>
@@ -360,14 +363,14 @@ namespace DoodleJump
                 }
                 else
                 {
-                    if (!GameState.isDoodleFrozen)
+                    if (!GameState.IsDoodleFrozen)
                     {
                         if (new Rectangle(GameConfig.GameUiConfig.Positions.PauseButton, GameConfig.GameUiConfig.Dimensions.PauseButton).Contains(e.Location))
                         {
                             ApplyPause();
                         }
                     }
-                    if (GameState.isDoodleFrozen)
+                    if (GameState.IsDoodleFrozen)
                     {
                         if (new Rectangle(GameConfig.PauseMenuConfig.Positions.ButtonResume, GameConfig.PauseMenuConfig.Dimensions.ButtonResume).Contains(e.Location))
                         {
@@ -384,7 +387,6 @@ namespace DoodleJump
         /// </summary>
         private void RestartGame()
         {
-
             GameManagerObjectCanvas.AllClearObject();
             GameManagerObjectCanvas.GenerateStartSequence(); ///возможно нужно посмотреть на логику, то есть обнулить логику появления платформ!!!
             player = new Player();
@@ -395,16 +397,15 @@ namespace DoodleJump
         /// </summary>
         private void ApplyPause()
         {
-            if (!GameState.isDoodleFrozen)
+            if (!GameState.IsDoodleFrozen)
             {
-                GameState.isDoodleFrozen = true;
+                GameState.IsDoodleFrozen = true;
             }
             else
             {
-                GameState.isDoodleFrozen = false;
+                GameState.IsDoodleFrozen = false;
                 timer.Start();
             }
         }
-
     }
 }

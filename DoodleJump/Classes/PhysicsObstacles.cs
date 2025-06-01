@@ -6,41 +6,89 @@ using System.Threading.Tasks;
 
 namespace DoodleJump.Classes
 {
+    /// <summary>
+    /// Класс, реализующий физику перемещающихся препятствий.
+    /// </summary>
     public class PhysicsObstacles
     {
-        public Transform Transform { get; set; }
-        public int Speed { get; set; }
-        private bool isMovingRight;
-        private int rightBoundary;
-        private int leftBoundary;
+        private Transform _transform;
+        private int _speed;
+        private bool _isMovingRight;
+        private readonly int _rightBoundary;
+        private readonly int _leftBoundary;
 
-        public PhysicsObstacles(Transform transform, int speed = 0)
+        /// <summary>
+        /// Трансформация препятствия (позиция и размер).
+        /// </summary>
+        public Transform Transform
         {
-            this.Transform = transform;
-            this.Speed = speed;
-            isMovingRight = true;
-            leftBoundary = GameConfig.PaddingCanvas;
-            rightBoundary = GameConfig.CanvasParameters.Width - GameConfig.PaddingCanvas - transform.Size.Width;
+            get => _transform;
+            set => _transform = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         /// <summary>
-        /// Перемещение объектов по Ox
+        /// Скорость перемещения препятствия.
+        /// </summary>
+        public int Speed
+        {
+            get => _speed;
+            set => _speed = value >= 0 ? value : throw new ArgumentOutOfRangeException(nameof(value), "Скорость не может быть отрицательной");
+        }
+
+        /// <summary>
+        /// Конструктор класса.
+        /// </summary>
+        /// <param name="transform">Трансформация препятствия.</param>
+        /// <param name="speed">Скорость перемещения (по умолчанию 0).</param>
+        public PhysicsObstacles(Transform transform, int speed = 0)
+        {
+            Transform = transform;
+            Speed = speed;
+            _isMovingRight = true;
+            _leftBoundary = GameConfig.PaddingCanvas;
+            _rightBoundary = GameConfig.CanvasParameters.Width - GameConfig.PaddingCanvas - transform.Size.Width;
+        }
+
+        /// <summary>
+        /// Перемещает объект по горизонтали между границами
         /// </summary>
         public void MoveObjectOx()
         {
-            float newX = Transform.Position.X + (isMovingRight ? Speed : -Speed);
+            if (Speed == 0) return;
 
-            if (isMovingRight && newX > rightBoundary)
+            float newX = CalculateNewPosition();
+
+            if (NeedToChangeDirection(newX))
             {
-                newX = rightBoundary;
-                isMovingRight = false;
+                newX = GetBoundaryPosition();
+                _isMovingRight = !_isMovingRight;
             }
-            else if (!isMovingRight && newX < leftBoundary)
-            {
-                newX = leftBoundary;
-                isMovingRight = true;
-            }
+
             Transform.Position.X = newX;
+        }
+
+        /// <summary>
+        /// Сбрасывает движение препятствия в начальное состояние
+        /// </summary>
+        public void ResetMovement()
+        {
+            _isMovingRight = true;
+        }
+
+        private float CalculateNewPosition()
+        {
+            return Transform.Position.X + (_isMovingRight ? Speed : -Speed);
+        }
+
+        private bool NeedToChangeDirection(float newX)
+        {
+            return (_isMovingRight && newX > _rightBoundary) ||
+                   (!_isMovingRight && newX < _leftBoundary);
+        }
+
+        private float GetBoundaryPosition()
+        {
+            return _isMovingRight ? _rightBoundary : _leftBoundary;
         }
     }
 }

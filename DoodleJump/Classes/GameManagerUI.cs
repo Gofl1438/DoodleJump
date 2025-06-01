@@ -6,27 +6,35 @@ using System.Threading.Tasks;
 
 namespace DoodleJump.Classes
 {
+    /// <summary>
+    /// Менеджер пользовательского интерфейса игры.
+    /// </summary>
     public static class GameManagerUI
     {
-        public static List<ElementUI> elementInterface = new List<ElementUI>();
-        public static List<ElementUI> elementPause = new List<ElementUI>();
-        public static List<ElementUI> elementGameOver = new List<ElementUI>();
-        public static List<ElementUI> elementStartMenu = new List<ElementUI>();
-        public static void AppendElementInterface()
+        public static List<ElementUI> InterfaceElements { get; } = new List<ElementUI>();
+        public static List<ElementUI> PauseMenuElements { get; } = new List<ElementUI>();
+        public static List<ElementUI> GameOverElements { get; } = new List<ElementUI>();
+        public static List<ElementUI> MainMenuElements { get; } = new List<ElementUI>();
+        /// <summary>
+        /// Инициализирует все UI элементы игры
+        /// </summary>
+        public static void InitializeAllUI()
         {
-            ClearElementInterface();
+            ClearAllElements();
             AddElementInterface();
             AddElementPause();
             AddElementGameOver();
             AddElementStartMenu();
         }
-
-        public static void ClearElementInterface()
+        /// <summary>
+        /// Очищает все списки UI элементов
+        /// </summary>
+        public static void ClearAllElements()
         {
-            elementInterface.Clear();
-            elementGameOver.Clear();
-            elementPause.Clear();
-            elementStartMenu.Clear();
+            InterfaceElements.Clear();
+            GameOverElements.Clear();
+            PauseMenuElements.Clear();
+            MainMenuElements.Clear();
         }
 
         private static void AddElementInterface()
@@ -42,8 +50,8 @@ namespace DoodleJump.Classes
                 GameConfig.GameUiConfig.Positions.Panel
                 );
 
-            elementInterface.Add(Panel);
-            elementInterface.Add(PauseButton);
+            InterfaceElements.Add(Panel);
+            InterfaceElements.Add(PauseButton);
         }
 
         private static void AddElementPause()
@@ -58,8 +66,8 @@ namespace DoodleJump.Classes
                 GameConfig.PauseMenuConfig.Dimensions.Background,
                 GameConfig.PauseMenuConfig.Positions.Background
                 );
-            elementPause.Add(BackgroundPause);
-            elementPause.Add(ButtonResume);
+            PauseMenuElements.Add(BackgroundPause);
+            PauseMenuElements.Add(ButtonResume);
         }
         private static void AddElementGameOver()
         {
@@ -78,9 +86,9 @@ namespace DoodleJump.Classes
                 GameConfig.GameOverConfig.Dimensions.TitleGameOver,
                 GameConfig.GameOverConfig.Positions.TitleGameOver
                 );
-            elementGameOver.Add(ButtonPlayAgain);
-            elementGameOver.Add(ButtonMenu);
-            elementGameOver.Add(TitleGameOver);
+            GameOverElements.Add(ButtonPlayAgain);
+            GameOverElements.Add(ButtonMenu);
+            GameOverElements.Add(TitleGameOver);
         }
         public static void AddElementStartMenu()
         {
@@ -99,9 +107,9 @@ namespace DoodleJump.Classes
                 GameConfig.MainMenuConfig.Dimensions.BackgroundError,
                 GameConfig.MainMenuConfig.Positions.BackgroundError
                 );
-            elementStartMenu.Add(TitleDoodleJump);
-            elementStartMenu.Add(ButtonStartPlay);
-            elementStartMenu.Add(BackgroundError);
+            MainMenuElements.Add(TitleDoodleJump);
+            MainMenuElements.Add(ButtonStartPlay);
+            MainMenuElements.Add(BackgroundError);
         }
     }
 }

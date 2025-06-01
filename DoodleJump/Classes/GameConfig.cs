@@ -1,28 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DoodleJump.Classes
 {
+    /// <summary>
+    /// Централизованный конфигурационный класс игры, содержащий все настройки, параметры игровых объектов и UI-элементов.
+    /// </summary>
     public static class GameConfig
     {
+        /// <summary>
+        /// Типы платформ в игре.
+        /// </summary>
         public enum PlatformType { Blue, Brown, Green, White }
+        /// <summary>
+        /// Типы монстров в игре (в текущей версии только красный).
+        /// </summary>
         public enum MonstrumType { Red }
 
-        public static readonly int DifficultyCoefficient = 500;//
+        // Базовые параметры игры.
+
+        public static readonly int DifficultyCoefficient = 500;
         public static Size CanvasParameters { get; private set; }
         public static readonly int PaddingCanvas = 20;
+
+        /// <summary>
+        /// Инициализирует конфигурацию игры на основе размеров игрового поля.
+        /// </summary>
+        /// <param name="canvasSize"></param>
         public static void Initialize(Size canvasSize)
         {
             CanvasParameters = canvasSize;
-            InitializePauseMenu(canvasSize);
-            InitializeGameOverScreen(canvasSize);
-            InitializeMainMenu(canvasSize);
+            InitializePauseMenu();
+            InitializeGameOverScreen();
+            InitializeMainMenu();
         }
-
-        private static void InitializePauseMenu(Size canvasSize)
+        private static void InitializePauseMenu()
         {
             PauseMenuConfig.WidthBackground = CanvasParameters.Width;
             PauseMenuConfig.HeightBackground = CanvasParameters.Height;
@@ -30,7 +46,7 @@ namespace DoodleJump.Classes
             PauseMenuConfig.OyButtonResume = CanvasParameters.Height - PauseMenuConfig.HeightButtonResume - PauseMenuConfig.OffsetDownButtonResume;
         }
 
-        private static void InitializeGameOverScreen(Size canvasSize)
+        private static void InitializeGameOverScreen()
         {
             GameOverConfig.OxTitleGameOver = (CanvasParameters.Width - GameOverConfig.WidthTitleGameOver) / 2;
             GameOverConfig.OyButtonMenu = CanvasParameters.Height - PauseMenuConfig.HeightButtonResume - GameOverConfig.OffsetDownButtonMenu;
@@ -38,7 +54,7 @@ namespace DoodleJump.Classes
             GameOverConfig.OyButtonAgainPlay = CanvasParameters.Height - PauseMenuConfig.HeightButtonResume - GameOverConfig.OffsetDownButtonAgainPlay;
         }
 
-        private static void InitializeMainMenu(Size canvasSize)
+        private static void InitializeMainMenu()
         {
 
             MainMenuConfig.OxTitleDoodleJump = (CanvasParameters.Width - MainMenuConfig.WidthTitleDoodleJump) / 2;
@@ -48,20 +64,28 @@ namespace DoodleJump.Classes
         }
 
         /// <summary>
-        /// Информация об игроке
+        /// Конфигурация игрока.
         /// </summary>
         public static class Player
         {
             public static readonly float Acceleration = 0.3f;
             public static readonly float MovingOx = 8;
-            public static readonly int DefaultGrafity = -14;
+            public static readonly int DefaultGravity = -14;
             public static readonly int JumpHeight = 350;
+
+            /// <summary>
+            /// Спрайты игрока в разных состояниях.
+            /// </summary>
             public static class Sprites
             {
                 public static readonly Bitmap Right = Properties.Resources.DoodleRight;
                 public static readonly Bitmap Left = Properties.Resources.DoodleLeft;
                 public static readonly Bitmap Up = Properties.Resources.DoodleUp;
             }
+
+            /// <summary>
+            /// Геометрические параметры игрока.
+            /// </summary>
             public static class Dimensions
             {
                 public static readonly int UpWidth = 123;
@@ -73,7 +97,7 @@ namespace DoodleJump.Classes
         }
 
         /// <summary>
-        /// Информация об монстрах
+        /// Конфигурация монстров.
         /// </summary>
         public static class Monstrum
         {
@@ -85,7 +109,7 @@ namespace DoodleJump.Classes
         }
 
         /// <summary>
-        /// Информация об платформах
+        /// Конфигурация платформ.
         /// </summary>
         public static class PlatformConfig
         {
@@ -97,6 +121,9 @@ namespace DoodleJump.Classes
             public static readonly int MinQuantityInBlock = 1;
             public static readonly int MinInitialQuantityInBlock = 5;
             public static readonly int SpeedBlue = 5;
+            /// <summary>
+            /// Спрайты платформ разных типов
+            /// </summary>
             public static class Sprites
             {
                 public static readonly Bitmap Green = Properties.Resources.GreenPlatform;
@@ -107,7 +134,7 @@ namespace DoodleJump.Classes
         }
 
         /// <summary>
-        /// Информация об пружине
+        /// Конфигурация пружины.
         /// </summary>
         public static class Spring
         {
@@ -118,7 +145,7 @@ namespace DoodleJump.Classes
         }
 
         /// <summary>
-        /// Информация об мяче
+        /// Конфигурация мяча.
         /// </summary>
         public static class Ball
         {
@@ -129,7 +156,7 @@ namespace DoodleJump.Classes
         }
 
         /// <summary>
-        /// Игровой интерфейс
+        /// Конфигурация игрового интерфейса.
         /// </summary>
         public static class GameUiConfig
         {
@@ -149,12 +176,19 @@ namespace DoodleJump.Classes
             private const int OyPauseButton = 15;
             private const int OxScore = 25;
             private const int OyScore = 10;
+
+            /// <summary>
+            /// Размер UI-элемента.
+            /// </summary>
             public static class Dimensions
             {
                 public static readonly Size Panel = new Size(WidthPanel, HeightPanel);
                 public static readonly Size PauseButton = new Size(WidthButtonPause, HeightButtonPause);
                 public static readonly Font ScoreFont = new Font(FamilyNameScore, SizeScore, StyleScore);
             }
+            /// <summary>
+            /// Позиция UI-элемента.
+            /// </summary>
             public static class Positions
             {
                 public static readonly Point Panel = new Point(OxPanel, OyPanel);
@@ -164,7 +198,7 @@ namespace DoodleJump.Classes
         }
 
         /// <summary>
-        /// Меню паузы
+        /// Конфигурация меню паузы
         /// </summary>
         public static class PauseMenuConfig
         {
@@ -179,12 +213,17 @@ namespace DoodleJump.Classes
             public static int OxButtonResume { get; set; }
             public static int OyButtonResume { get; set; }
             public const int OffsetDownButtonResume = 200;
-
+            /// <summary>
+            /// Размер UI-элемента.
+            /// </summary>
             public static class Dimensions
             {
                 public static readonly Size Background = new Size(WidthBackground, HeightBackground);
                 public static readonly Size ButtonResume = new Size(WidthButtonResume, HeightButtonResume);
             }
+            /// <summary>
+            /// Позиция UI-элемента.
+            /// </summary>
             public static class Positions
             {
                 public static readonly Point Background = new Point(OxBackground, OyBackground);
@@ -193,7 +232,7 @@ namespace DoodleJump.Classes
         }
 
         /// <summary>
-        /// Главное меню 
+        /// Конфигурация главного меню 
         /// </summary>
         public static class MainMenuConfig
         {
@@ -217,12 +256,18 @@ namespace DoodleJump.Classes
             public const int WidthButtonStartPlay = 222;
             public const int OffsetDownButtonStartPlay = 300;
 
+            /// <summary>
+            /// Размер UI-элемента.
+            /// </summary>
             public static class Dimensions
             {
                 public static readonly Size TitleDoodleJump = new Size(WidthTitleDoodleJump, HeightTitleDoodleJump);
                 public static readonly Size BackgroundError = new Size(WidthBackgroundError, HeightBackgroundError);
                 public static readonly Size ButtonStartPlay = new Size(WidthButtonStartPlay, HeightButtonStartPlay);
             }
+            /// <summary>
+            /// Позиция UI-элемента.
+            /// </summary>
             public static class Positions
             {
                 public static readonly Point TitleDoodleJump = new Point(OxTitleDoodleJump, OyTitleDoodleJump);
@@ -232,7 +277,7 @@ namespace DoodleJump.Classes
         }
 
         /// <summary>
-        /// Сцена завершения игры
+        /// Конфигурация сцены проигрыша.
         /// </summary>
         public static class GameOverConfig
         {
@@ -254,12 +299,19 @@ namespace DoodleJump.Classes
             private const int WidthButtonAgainPlay = 222;
             public const int OffsetDownButtonMenu = 50;
             public const int OffsetDownButtonAgainPlay = 150;
+
+            /// <summary>
+            /// Размер UI-элемента.
+            /// </summary>
             public static class Dimensions
             {
                 public static readonly Size TitleGameOver = new Size(WidthTitleGameOver, HeightTitleGameOver);
                 public static readonly Size ButtonMenu = new Size(WidthButtonMenu, HeightButtonMenu);
                 public static readonly Size ButtonPlayAgain = new Size(WidthButtonAgainPlay, HeightButtonAgainPlay);
             }
+            /// <summary>
+            /// Позиция UI-элемента.
+            /// </summary>
             public static class Positions
             {
                 public static readonly Point TitleGameOver = new Point(OxTitleGameOver, OyTitleGameOver);
@@ -268,13 +320,20 @@ namespace DoodleJump.Classes
             }
         }
 
+        /// <summary>
+        /// Скорости камеры в различных игровых ситуациях.
+        /// </summary>
         public static class CameraSpeeds
+
         {
             public static readonly int FallDeath = CanvasParameters.Height / 15;
             public static readonly int FallDeathSceneTwo = CanvasParameters.Height / 70;
             public static readonly int MonsterDeath = CanvasParameters.Height / 70;
         }
 
+        /// <summary>
+        /// Вероятностные параметры игровых объектов.
+        /// </summary>
         public static class Probabilities
         {
             public static float Spring = 0.08f;
@@ -284,7 +343,6 @@ namespace DoodleJump.Classes
             public static float BrownStart = 0.3f;
             public static float GreenStart = 0.6f;
             public static float WhiteStart = 0f;
-
 
             public static float BlueScoreFactor = 0.01f;
             public static float BrownScoreFactor = -0.01f;

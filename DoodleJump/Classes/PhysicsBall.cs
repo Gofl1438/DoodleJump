@@ -6,48 +6,100 @@ using System.Threading.Tasks;
 
 namespace DoodleJump.Classes
 {
+    /// <summary>
+    /// Класс, реализующий физику мяча в игре.
+    /// </summary>
     public class PhysicsBall
     {
-        public Transform transform { get; set; }
-        public bool IsWasHit { get; set; }
-        public PhysicsBall(Transform transform)
+        private Transform _transform;
+
+        /// <summary>
+        /// Трансформация мяча (позиция и размер).
+        /// </summary>
+        public Transform Transform
         {
-            this.transform = transform;
-            IsWasHit = false;
-        }
-        public void MoveBallOy()
-        {
-            transform.Position.Y -= GameConfig.Ball.Speed;
+            get => _transform;
+            set => _transform = value ?? throw new ArgumentNullException(nameof(value));
         }
 
+        /// <summary>
+        /// Флаг, указывающий было ли попадание по монстру.
+        /// </summary>
+        public bool IsWasHit { get; set; }
+
+        /// <summary>
+        /// Конструктор класса PhysicsBall.
+        /// </summary>
+        /// <param name="transform">Трансформация мяча.</param>
+        public PhysicsBall(Transform transform)
+        {
+            Transform = transform;
+            IsWasHit = false;
+        }
+
+        /// <summary>
+        /// Перемещает мяч вверх по оси Y
+        /// </summary>
+        public void MoveBallOy()
+        {
+            if (Transform == null)
+                throw new InvalidOperationException("Transform не задан");
+
+            Transform.Position.Y -= GameConfig.Ball.Speed;
+        }
+
+        /// <summary>
+        /// Проверяет столкновение мяча с монстрами и наносит урон при попадании
+        /// </summary>
         public void CollideWithMonstrum()
         {
-            float OxBall = transform.Position.X;
-            float OyBall = transform.Position.Y;
-            int WidthBall = transform.Size.Width;
-            int HeightBall = transform.Size.Height;
-            foreach (var obj in GameManagerObjectCanvas.objectCanvas)
+            if (Transform == null)
+                throw new InvalidOperationException("Transform не задан");
+
+            var ballRect = GetBoundingBox(Transform);
+
+            foreach (var obj in GameManagerObjectCanvas.Objects)
             {
                 if (obj is Monstrum monstrum)
                 {
-                    float OxMonstr = monstrum.Transform.Position.X;
-                    float OyMonstr = monstrum.Transform.Position.Y;
-                    int WidthMonstr = monstrum.Transform.Size.Width;
-                    int HeightMonstr = monstrum.Transform.Size.Height;
-                    if (OxBall <= OxMonstr + WidthMonstr && OxBall + WidthBall >= OxMonstr)
+                    var monsterRect = GetBoundingBox(monstrum.Transform);
+
+                    if (ballRect.IntersectsWith(monsterRect))
                     {
-                        if (OyBall + HeightBall >= OyMonstr && OyBall + HeightBall <= OyMonstr + HeightMonstr)
-                        {
-                            IsWasHit = true;
-                            if (monstrum.HealthPoints == 0)
-                            {
-                                monstrum.IsTouchedByPlayer = true;
-                            }
-                            monstrum.HealthPoints--;
-                        }
+                        HandleMonsterHit(monstrum);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Обрабатывает попадание по монстру.
+        /// </summary>
+        /// <param name="monstrum">Монстр, по которому попали.</param>
+        private void HandleMonsterHit(Monstrum monstrum)
+        {
+            IsWasHit = true;
+            monstrum.HealthPoints--;
+
+            if (monstrum.HealthPoints <= 0)
+            {
+                monstrum.IsTouchedByPlayer = true;
+                monstrum.HealthPoints = 0;
+            }
+        }
+
+        /// <summary>
+        /// Создает прямоугольник для проверки столкновений.
+        /// </summary>
+        /// <param name="transform">Трансформация объекта.</param>
+        /// <returns></returns>
+        private RectangleF GetBoundingBox(Transform transform)
+        {
+            return new RectangleF(
+                transform.Position.X,
+                transform.Position.Y,
+                transform.Size.Width,
+                transform.Size.Height);
         }
     }
 }

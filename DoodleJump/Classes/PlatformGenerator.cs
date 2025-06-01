@@ -7,11 +7,20 @@ using static DoodleJump.Classes.GameConfig;
 
 namespace DoodleJump.Classes
 {
+    /// <summary>
+    /// Статический класс для генерации платформ в игре
+    /// </summary>
     public static class PlatformGenerator
     {
-        private static Random rand = new Random();
-        private static int heightBlock = GameConfig.Player.JumpHeight - PaddingCanvas - GameConfig.PlatformConfig.Height;
+        private static readonly Random rand = new Random();
+        private static readonly int heightBlock = GameConfig.Player.JumpHeight - PaddingCanvas - GameConfig.PlatformConfig.Height;
+        private static int PaddingCanvas = GameConfig.PaddingCanvas;
 
+        /// <summary>
+        /// Генерирует блок платформ.
+        /// </summary>
+        /// <param name="objectCanvas"></param>
+        /// <returns></returns>
         public static List<Platform> BlockPlatform(List<ObjectObstacles> objectCanvas)
         {
             List<Platform> blockPlatforms = new List<Platform>();
