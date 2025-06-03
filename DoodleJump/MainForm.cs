@@ -345,11 +345,6 @@ namespace DoodleJump
                     if (new Rectangle(GameConfig.GameOverConfig.Positions.ButtonPlayAgain, GameConfig.GameOverConfig.Dimensions.ButtonPlayAgain).Contains(e.Location))
                     {
                         RestartGame();
-                        GameState.IsSceneGameOver = false;
-                        GameState.IsMonsterDeath = false;
-                        GameState.IsFallDeath = false;
-                        GameState.IsFallDeathSceneTwo = false;
-                        GameState.Score = 0;
                         timer.Start();
                     }
                     if (new Rectangle(GameConfig.GameOverConfig.Positions.ButtonMenu, GameConfig.GameOverConfig.Dimensions.ButtonMenu).Contains(e.Location))
