@@ -21,9 +21,7 @@ namespace DoodleJump.Classes
         public ElementUI(Bitmap sprite, Size sizeObject, Point pointObject)
         {
             this.Sprite = sprite;
-            Size size = sizeObject;
-            Point point = pointObject;
-            Transform = new Transform(point, size);
+            Transform = new Transform(pointObject, sizeObject);
         }
     }
 }

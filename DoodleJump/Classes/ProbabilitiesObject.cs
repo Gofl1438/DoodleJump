@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,14 +64,13 @@ namespace DoodleJump.Classes
             }
             return normalizedProbabilities;
         }
-
+         
         /// <summary>
         /// Рассчитывает текущие вероятности появления платформ на основе счета игрока
         /// </summary>
         private static Dictionary<PlatformType, float> GetCurrentProbabilities()
         {
             float scoreMultiplier = GameState.Score / GameConfig.DifficultyCoefficient;
-
             return new Dictionary<PlatformType, float>
             {
                 [PlatformType.Blue] = Math.Min(Probabilities.BlueStart + Probabilities.BlueScoreFactor * scoreMultiplier, Probabilities.BlueMax),

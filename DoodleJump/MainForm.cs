@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows.Forms;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace DoodleJump
 {
@@ -21,9 +22,9 @@ namespace DoodleJump
             InitializeComponent();
             СalibrationSize();
             InitializeGameState();
-            GameManagerUI.InitializeAllUI();
+            GameManagerUI.AddElementStartMenu();
             timer = new System.Windows.Forms.Timer();
-            timer.Interval = 15;
+            timer.Interval = 14;
             timer.Tick += Update;
             timer.Start();
         }
@@ -132,7 +133,6 @@ namespace DoodleJump
                 GameManagerObjectCanvas.ApplyPhysicsObject();
                 GameManagerObjectCanvas.ApplyPhysicsBall();
                 GameManagerObjectCanvas.ClearBall();
-                doodleCanvas.Invalidate();
             }
             doodleCanvas.Invalidate();
         }
@@ -262,6 +262,7 @@ namespace DoodleJump
             {
                 timer.Stop();
                 GameState.IsSceneGameOver = true;
+                GameManagerUI.AddElementGameOver();
             }
         }
 
@@ -309,6 +310,7 @@ namespace DoodleJump
             {
                 timer.Stop();
                 GameState.IsSceneGameOver = true;
+                GameManagerUI.AddElementGameOver();
             }
         }
 
@@ -336,6 +338,8 @@ namespace DoodleJump
                 {
                     RestartGame();
                     GameState.IsSceneMenu = false;
+                    GameManagerUI.ClearAllElements();
+                    GameManagerUI.AddElementInterface();
                 }
             }
             else
@@ -344,6 +348,10 @@ namespace DoodleJump
                 {
                     if (new Rectangle(GameConfig.GameOverConfig.Positions.ButtonPlayAgain, GameConfig.GameOverConfig.Dimensions.ButtonPlayAgain).Contains(e.Location))
                     {
+                        InitializeGameState();
+                        GameState.IsSceneMenu = false;
+                        GameManagerUI.ClearAllElements();
+                        GameManagerUI.AddElementInterface();
                         RestartGame();
                         timer.Start();
                     }
@@ -351,6 +359,7 @@ namespace DoodleJump
                     {
                         InitializeGameState();
                         GameManagerObjectCanvas.AllClearObject();
+                        GameManagerUI.ClearAllElements();
                         GameManagerUI.AddElementStartMenu();
                         doodleCanvas.Invalidate();
                         timer.Start();
@@ -383,7 +392,7 @@ namespace DoodleJump
         private void RestartGame()
         {
             GameManagerObjectCanvas.AllClearObject();
-            GameManagerObjectCanvas.GenerateStartSequence(); ///возможно нужно посмотреть на логику, то есть обнулить логику появления платформ!!!
+            GameManagerObjectCanvas.GenerateStartSequence();
             player = new Player();
         }
 
@@ -395,10 +404,13 @@ namespace DoodleJump
             if (!GameState.IsDoodleFrozen)
             {
                 GameState.IsDoodleFrozen = true;
+                GameManagerUI.AddElementPause();
             }
             else
             {
                 GameState.IsDoodleFrozen = false;
+                GameManagerUI.ClearAllElements();
+                GameManagerUI.AddElementInterface();
                 timer.Start();
             }
         }

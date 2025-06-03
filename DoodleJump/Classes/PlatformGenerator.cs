@@ -13,7 +13,7 @@ namespace DoodleJump.Classes
     public static class PlatformGenerator
     {
         private static readonly Random rand = new Random();
-        private static readonly int heightBlock = GameConfig.Player.JumpHeight - PaddingCanvas - GameConfig.PlatformConfig.Height;
+        private static readonly int heightBlock = GameConfig.Player.JumpHeight - PaddingCanvas - GameConfig.PlatformConfig.Height * 2;
         private static int PaddingCanvas = GameConfig.PaddingCanvas;
 
         /// <summary>
