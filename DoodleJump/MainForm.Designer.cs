@@ -97,7 +97,7 @@
             doodleCanvas.TabIndex = 0;
             doodleCanvas.TabStop = false;
             doodleCanvas.Paint += OnRepaint;
-            doodleCanvas.MouseDown += doodleCanvas_MouseDown;
+            doodleCanvas.MouseClick += doodleCanvas_MouseDown;
             // 
             // MainForm
             // 

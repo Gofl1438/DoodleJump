@@ -15,17 +15,7 @@ namespace DoodleJump.Classes
         public static List<ElementUI> PauseMenuElements { get; } = new List<ElementUI>();
         public static List<ElementUI> GameOverElements { get; } = new List<ElementUI>();
         public static List<ElementUI> MainMenuElements { get; } = new List<ElementUI>();
-        /// <summary>
-        /// Инициализирует все UI элементы игры
-        /// </summary>
-        public static void InitializeAllUI()
-        {
-            ClearAllElements();
-            AddElementInterface();
-            AddElementPause();
-            AddElementGameOver();
-            AddElementStartMenu();
-        }
+
         /// <summary>
         /// Очищает все списки UI элементов
         /// </summary>
@@ -37,7 +27,7 @@ namespace DoodleJump.Classes
             MainMenuElements.Clear();
         }
 
-        private static void AddElementInterface()
+        public static void AddElementInterface()
         {
             ElementUI PauseButton = new ElementUI(
                 GameConfig.GameUiConfig.PauseButton,
@@ -54,7 +44,7 @@ namespace DoodleJump.Classes
             InterfaceElements.Add(PauseButton);
         }
 
-        private static void AddElementPause()
+        public static void AddElementPause()
         {
             ElementUI ButtonResume = new ElementUI(
                 GameConfig.PauseMenuConfig.ButtonResume,
@@ -69,7 +59,7 @@ namespace DoodleJump.Classes
             PauseMenuElements.Add(BackgroundPause);
             PauseMenuElements.Add(ButtonResume);
         }
-        private static void AddElementGameOver()
+        public static void AddElementGameOver()
         {
             ElementUI ButtonMenu = new ElementUI(
                 GameConfig.GameOverConfig.ButtonMenu,

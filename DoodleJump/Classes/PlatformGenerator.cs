@@ -55,7 +55,7 @@ namespace DoodleJump.Classes
                 posLast = GameConfig.CanvasParameters.Height - PaddingCanvas - GameConfig.PlatformConfig.Height;
             }
             else
-            { 
+            {
                 var lastPlatform = objectCanvas[objectCanvas.Count - 1];
                 posLast = (int)lastPlatform.Transform.Position.Y - GameConfig.PlatformConfig.Height - PaddingCanvas;
             }
