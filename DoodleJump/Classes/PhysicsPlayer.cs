@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
+using static DoodleJump.Classes.GameConfig;
 
 namespace DoodleJump.Classes
 {
@@ -90,16 +92,8 @@ namespace DoodleJump.Classes
         {
             CheckFallDeath();
 
-            var playerRect = GetBoundingBox(Transform);
-            int lengthTrunk = GameConfig.Player.Dimensions.LengthTrunk;
-
             foreach (var obj in GameManagerObjectCanvas.Objects)
             {
-                var objRect = GetBoundingBox(obj.Transform);
-
-                if (!CheckHorizontalCollision(playerRect, objRect, lengthTrunk))
-                    continue;
-
                 ProcessCollisionWithObject(obj);
             }
         }
@@ -125,15 +119,18 @@ namespace DoodleJump.Classes
             switch (obj)
             {
                 case Platform platform when Gravity > 0:
-                    HandlePlatformCollision(platform);
+                    if (CheckHorizontalCollisionTotal(platform.Transform, GameConfig.Player.Dimensions.LengthTrunk))
+                        HandlePlatformCollision(platform);
                     break;
 
                 case Monstrum monstrum:
-                    HandleMonsterCollision(monstrum);
+                    if (CheckHorizontalCollisionMonstrum(monstrum.Transform, GameConfig.Player.Dimensions.LengthTrunk))
+                        HandleMonsterCollision(monstrum);
                     break;
 
                 case Spring spring when Gravity > 0:
-                    HandleSpringCollision(spring);
+                    if (CheckHorizontalCollisionTotal(spring.Transform, GameConfig.Player.Dimensions.LengthTrunk))
+                        HandleSpringCollision(spring);
                     break;
             }
         }
@@ -181,7 +178,7 @@ namespace DoodleJump.Classes
             }
             else if (Gravity < 0)
             {
-                if (IsPlayerHittingFromBelow(monstrum.Transform))
+                if (IsPlayerHittingFromBelow(monstrum.Transform, GameConfig.Player.Dimensions.LengthTrunk))
                 {
                     GameState.IsMonsterDeath = true;
                 }
@@ -228,20 +225,19 @@ namespace DoodleJump.Classes
             }
         }
 
-        private RectangleF GetBoundingBox(Transform transform)
+
+        private bool CheckHorizontalCollisionMonstrum(Transform obj, int lengthTrunk)
         {
-            return new RectangleF(
-                transform.Position.X,
-                transform.Position.Y,
-                transform.Size.Width,
-                transform.Size.Height);
+            return (Transform.Position.X + Transform.Size.Width - lengthTrunk >= obj.Position.X) &&
+                (Transform.Position.X + lengthTrunk <= obj.Position.X + obj.Size.Width);
         }
 
-        private bool CheckHorizontalCollision(RectangleF playerRect, RectangleF objRect, int lengthTrunk)
+        private bool CheckHorizontalCollisionTotal(Transform obj, int lengthTrunk)
         {
-            return playerRect.Right - lengthTrunk > objRect.Left &&
-                   playerRect.Left + lengthTrunk < objRect.Right;
+            return (Transform.Position.X + lengthTrunk <= obj.Position.X + obj.Size.Width &&
+                Transform.Position.X + Transform.Size.Width - lengthTrunk >= obj.Position.X);
         }
+
 
         private bool IsPlayerOnTop(Transform objTransform, float heightFactor = 1f)
         {
@@ -249,16 +245,16 @@ namespace DoodleJump.Classes
                    Transform.Position.Y + Transform.Size.Height <= objTransform.Position.Y + objTransform.Size.Height * heightFactor;
         }
 
-        private bool IsPlayerInsideMonster(Transform monsterTransform)
+        private bool IsPlayerInsideMonster(Transform objTransform)
         {
-            return Transform.Position.Y + Transform.Size.Height > monsterTransform.Position.Y + monsterTransform.Size.Height * 0.5f &&
-                   Transform.Position.Y + Transform.Size.Height < monsterTransform.Position.Y + monsterTransform.Size.Height;
+            return Transform.Position.Y + Transform.Size.Height >= objTransform.Position.Y &&
+                   Transform.Position.Y + Transform.Size.Height <= objTransform.Position.Y + objTransform.Size.Height;
         }
 
-        private bool IsPlayerHittingFromBelow(Transform monsterTransform)
+        private bool IsPlayerHittingFromBelow(Transform monsterTransform, int lengthTrunk)
         {
-            return Transform.Position.Y + Transform.Size.Height <= monsterTransform.Position.Y + monsterTransform.Size.Height &&
-                   Transform.Position.Y + Transform.Size.Height >= monsterTransform.Position.Y;
+            return (Transform.Position.Y + lengthTrunk <= monsterTransform.Position.Y + monsterTransform.Size.Height) &&
+                (Transform.Position.Y + lengthTrunk >= monsterTransform.Position.Y);
         }
     }
 }

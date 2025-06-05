@@ -337,7 +337,7 @@ namespace DoodleJump.Classes
         public static class Probabilities
         {
             public static float Spring = 0.08f;
-            public static float Monstrum = 0.05f;
+            public static float Monstrum = 0.08f;
 
             public static float BlueStart = 0.1f;
             public static float BrownStart = 0.3f;

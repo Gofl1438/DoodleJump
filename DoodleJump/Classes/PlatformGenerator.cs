@@ -13,8 +13,8 @@ namespace DoodleJump.Classes
     public static class PlatformGenerator
     {
         private static readonly Random rand = new Random();
-        private static readonly int heightBlock = GameConfig.Player.JumpHeight - PaddingCanvas - GameConfig.PlatformConfig.Height;
-        private static int PaddingCanvas = GameConfig.PaddingCanvas;
+        private static readonly int heightBlock = GameConfig.Player.JumpHeight;
+        private static int PaddingCanvas = GameConfig.PaddingCanvas;  
 
         /// <summary>
         /// Генерирует блок платформ.
@@ -55,17 +55,16 @@ namespace DoodleJump.Classes
                 posLast = GameConfig.CanvasParameters.Height - PaddingCanvas - GameConfig.PlatformConfig.Height;
             }
             else
-            {
+            { 
                 var lastPlatform = objectCanvas[objectCanvas.Count - 1];
                 posLast = (int)lastPlatform.Transform.Position.Y - GameConfig.PlatformConfig.Height - PaddingCanvas;
             }
             int countPlatform = rand.Next(GameState.CurrentMinPlatformBlock, GameConfig.PlatformConfig.MaxQuantityInBlock);
-            int heightplatforms;
             int backlash = 0;
             if (countPlatform > 1)
             {
                 int k = countPlatform - 1;
-                heightplatforms = GameConfig.PlatformConfig.Height * k;
+                int heightplatforms = GameConfig.PlatformConfig.Height * k;
                 backlash = (heightBlock - heightplatforms - (PaddingCanvas * k)) / (k * 2);
             }
             for (int i = 0; i < countPlatform; i++)
@@ -73,21 +72,14 @@ namespace DoodleJump.Classes
                 Point point = new Point();
                 if (countPlatform == 1)
                 {
-                    if (objectCanvas.Count == 0)
-                    {
-                        point.Y = posLast;
-                    }
-                    else
-                    {
-                        point.Y = rand.Next(posLast - heightBlock, posLast);
-                    }
+                    point.Y = posLast;
                 }
                 else
                 {
                     if (objectCanvas.Count == 0)
                     {
                         point.Y = posLast;
-                        posLast -= (backlash + GameConfig.PlatformConfig.Height + PaddingCanvas);
+                        posLast -= (backlash + GameConfig.PlatformConfig.Height);
                     }
                     else
                     {

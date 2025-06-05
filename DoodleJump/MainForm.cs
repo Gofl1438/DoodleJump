@@ -23,7 +23,7 @@ namespace DoodleJump
             InitializeGameState();
             GameManagerUI.InitializeAllUI();
             timer = new System.Windows.Forms.Timer();
-            timer.Interval = 15;
+            timer.Interval = 14;
             timer.Tick += Update;
             timer.Start();
         }
@@ -344,11 +344,9 @@ namespace DoodleJump
                 {
                     if (new Rectangle(GameConfig.GameOverConfig.Positions.ButtonPlayAgain, GameConfig.GameOverConfig.Dimensions.ButtonPlayAgain).Contains(e.Location))
                     {
+                        InitializeGameState();
                         RestartGame();
-                        GameState.IsSceneGameOver = false;
-                        GameState.IsMonsterDeath = false;
-                        GameState.IsFallDeath = false;
-                        GameState.IsFallDeathSceneTwo = false;
+                        GameState.IsSceneMenu = false;
                         GameState.Score = 0;
                         timer.Start();
                     }
