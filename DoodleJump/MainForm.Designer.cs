@@ -42,10 +42,10 @@
             // 
             panel2.BackColor = Color.FromArgb(100, 73, 61);
             panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(883, 0);
+            panel2.Location = new Point(810, 0);
             panel2.Margin = new Padding(0);
             panel2.Name = "panel2";
-            panel2.Size = new Size(283, 1061);
+            panel2.Size = new Size(210, 838);
             panel2.TabIndex = 1;
             // 
             // panel1
@@ -55,7 +55,7 @@
             panel1.Location = new Point(0, 0);
             panel1.Margin = new Padding(0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(283, 1061);
+            panel1.Size = new Size(210, 838);
             panel1.TabIndex = 0;
             // 
             // tableLayoutPanel1
@@ -69,21 +69,20 @@
             tableLayoutPanel1.Controls.Add(panel3, 1, 0);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
-            tableLayoutPanel1.Margin = new Padding(3, 4, 3, 4);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 127F));
-            tableLayoutPanel1.Size = new Size(1166, 1061);
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 100F));
+            tableLayoutPanel1.Size = new Size(1020, 838);
             tableLayoutPanel1.TabIndex = 1;
             // 
             // panel3
             // 
             panel3.Controls.Add(doodleCanvas);
             panel3.Dock = DockStyle.Fill;
-            panel3.Location = new Point(283, 0);
+            panel3.Location = new Point(210, 0);
             panel3.Margin = new Padding(0);
             panel3.Name = "panel3";
-            panel3.Size = new Size(600, 1061);
+            panel3.Size = new Size(600, 838);
             panel3.TabIndex = 2;
             // 
             // doodleCanvas
@@ -91,9 +90,8 @@
             doodleCanvas.BackgroundImage = Properties.Resources.Background;
             doodleCanvas.Dock = DockStyle.Fill;
             doodleCanvas.Location = new Point(0, 0);
-            doodleCanvas.Margin = new Padding(3, 4, 3, 4);
             doodleCanvas.Name = "doodleCanvas";
-            doodleCanvas.Size = new Size(600, 1061);
+            doodleCanvas.Size = new Size(600, 838);
             doodleCanvas.TabIndex = 0;
             doodleCanvas.TabStop = false;
             doodleCanvas.Paint += OnRepaint;
@@ -101,16 +99,15 @@
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(8F, 19F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSize = true;
-            ClientSize = new Size(1166, 1061);
+            ClientSize = new Size(1020, 838);
             Controls.Add(tableLayoutPanel1);
             DoubleBuffered = true;
             KeyPreview = true;
-            Margin = new Padding(3, 4, 3, 4);
             MdiChildrenMinimizedAnchorBottom = false;
-            MinimumSize = new Size(683, 1030);
+            MinimumSize = new Size(600, 821);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Form1";
